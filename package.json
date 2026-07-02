@@ -1,0 +1,17 @@
+{
+  "name": "codereps",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "db:generate": "pnpm --filter @codereps/db generate",
+    "db:migrate": "pnpm --filter @codereps/db migrate",
+    "db:studio": "pnpm --filter @codereps/db studio"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/*
+ * CodeReps design tokens — PLACEHOLDERS from the design brief
+ * (~/DevBrain/wiki/projects/codereps-design-brief.md).
+ * Replaced by the real system after the Claude Design session (board task S0-3).
+ */
+@theme {
+  --color-bg: oklch(0.1 0 0);
+  --color-surface: oklch(0.145 0.004 250);
+  --color-raised: oklch(0.18 0.006 250);
+  --color-ink: oklch(0.93 0.005 250);
+  --color-muted: oklch(0.65 0.01 250);
+  --color-primary: oklch(0.65 0.16 250);
+  --color-accent: oklch(0.84 0.13 85);
+  --color-pass: oklch(0.72 0.15 150);
+  --color-fail: oklch(0.62 0.19 25);
+  --color-timeout: oklch(0.75 0.14 85);
+
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}

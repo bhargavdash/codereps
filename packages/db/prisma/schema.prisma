@@ -1,0 +1,177 @@
+// CodeReps data model — architecture §4:
+// ~/DevBrain/wiki/projects/codereps-architecture.md
+// Server is always-on (Railway) → direct :5432 connection, default pool.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Category {
+  react
+  dsa
+  typescript
+  javascript
+  css
+}
+
+enum Mode {
+  pattern_drill
+  syntax_sprint
+  component_recall
+  interview_sim
+}
+
+enum Runner {
+  js_worker
+  react_iframe
+  ts_check
+  css_iframe
+}
+
+enum SubStatus {
+  passed
+  failed
+  error
+  timeout
+  abandoned
+}
+
+/// 1:1 with Supabase auth.users — id is the auth user id.
+model Profile {
+  id          String   @id @db.Uuid
+  username    String   @unique
+  displayName String?  @map("display_name")
+  timezone    String   @default("Asia/Kolkata") // streak day boundary
+  settings    Json     @default("{}") // { strictPaste: true, ... }
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  attempts    Attempt[]
+  submissions Submission[]
+  progress    UserChallengeProgress[]
+  activity    DailyActivity[]
+  streak      Streak?
+
+  @@map("profiles")
+}
+
+model Challenge {
+  id               String   @id @default(uuid()) @db.Uuid
+  slug             String   @unique
+  title            String
+  category         Category
+  mode             Mode
+  difficulty       Int      @db.SmallInt // 1–5
+  runner           Runner
+  language         String // 'javascript' | 'typescript' | 'tsx' | 'css'
+  promptMd         String   @map("prompt_md")
+  starterCode      String   @map("starter_code")
+  solutionCode     String   @map("solution_code") // NEVER in pre-submit API payloads
+  solutionNotesMd  String?  @map("solution_notes_md")
+  tests            Json // discriminated union by runner; carries schemaVersion
+  parSeconds       Int      @map("par_seconds") // author's verified solve time
+  timeLimitSeconds Int      @map("time_limit_seconds")
+  tags             String[] // GIN index added in raw SQL migration (S0-5)
+  version          Int      @default(1)
+  isPublished      Boolean  @default(false) @map("is_published")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  attempts    Attempt[]
+  submissions Submission[]
+  progress    UserChallengeProgress[]
+
+  @@index([category, difficulty])
+  @@map("challenges")
+}
+
+/// Exists so the SERVER owns started_at — the client clock is never trusted.
+model Attempt {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  challengeId String   @map("challenge_id") @db.Uuid
+  startedAt   DateTime @default(now()) @map("started_at")
+
+  user       Profile     @relation(fields: [userId], references: [id])
+  challenge  Challenge   @relation(fields: [challengeId], references: [id])
+  submission Submission?
+
+  @@index([userId, challengeId])
+  @@map("attempts")
+}
+
+model Submission {
+  id            String    @id @default(uuid()) @db.Uuid
+  attemptId     String    @unique @map("attempt_id") @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  challengeId   String    @map("challenge_id") @db.Uuid
+  code          String
+  status        SubStatus
+  testsPassed   Int       @default(0) @map("tests_passed")
+  testsTotal    Int       @default(0) @map("tests_total")
+  durationMs    Int       @map("duration_ms") // server-computed: now − attempt.started_at
+  keystrokes    Int       @default(0)
+  pasteAttempts Int       @default(0) @map("paste_attempts")
+  fluencyScore  Decimal?  @map("fluency_score") @db.Decimal(5, 2)
+  trace         Json? // CM6 ChangeSet deltas, gzipped — recorded from day one (FF-1 replay)
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  attempt   Attempt   @relation(fields: [attemptId], references: [id])
+  user      Profile   @relation(fields: [userId], references: [id])
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, challengeId, createdAt(sort: Desc)])
+  @@map("submissions")
+}
+
+model UserChallengeProgress {
+  userId          String    @map("user_id") @db.Uuid
+  challengeId     String    @map("challenge_id") @db.Uuid
+  attemptsCount   Int       @default(0) @map("attempts_count")
+  passesCount     Int       @default(0) @map("passes_count")
+  bestFluency     Decimal?  @map("best_fluency") @db.Decimal(5, 2)
+  emaFluency      Decimal?  @map("ema_fluency") @db.Decimal(5, 2) // EMA, α = 0.5
+  lastAttemptedAt DateTime? @map("last_attempted_at")
+  firstPassedAt   DateTime? @map("first_passed_at")
+  srsIntervalDays Int       @default(0) @map("srs_interval_days")
+  srsEase         Decimal   @default(2.5) @map("srs_ease") @db.Decimal(3, 2)
+  nextReviewAt    DateTime? @map("next_review_at")
+
+  user      Profile   @relation(fields: [userId], references: [id])
+  challenge Challenge @relation(fields: [challengeId], references: [id])
+
+  @@id([userId, challengeId])
+  @@index([userId, nextReviewAt]) // the warmup query
+  @@map("user_challenge_progress")
+}
+
+/// Powers both the heatmap and streak qualification. Date is in the user's timezone.
+model DailyActivity {
+  userId        String   @map("user_id") @db.Uuid
+  activityDate  DateTime @map("activity_date") @db.Date
+  submissions   Int      @default(0)
+  passes        Int      @default(0)
+  minutesActive Int      @default(0) @map("minutes_active")
+
+  user Profile @relation(fields: [userId], references: [id])
+
+  @@id([userId, activityDate])
+  @@map("daily_activity")
+}
+
+model Streak {
+  userId         String    @id @map("user_id") @db.Uuid
+  current        Int       @default(0)
+  longest        Int       @default(0)
+  lastActiveDate DateTime? @map("last_active_date") @db.Date
+
+  user Profile @relation(fields: [userId], references: [id])
+
+  @@map("streaks")
+}
