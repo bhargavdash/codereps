@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="design_doc_mode" content="canvas">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: oklch(0.07 0 0);
+    color: oklch(0.93 0.005 250);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-variant-ligatures: none;
+  }
+  [contenteditable] { outline: none; caret-color: oklch(0.65 0.16 250); }
+  ::selection { background: oklch(0.65 0.16 250 / 0.32); color: oklch(0.97 0.005 250); }
+  .cr-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "ss01" 1; }
+  @keyframes crSplitIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+  @keyframes crPrSettle { 0% { opacity: 0; transform: scale(1.12) rotate(-4deg); } 55% { opacity: 1; } 100% { opacity: 1; transform: scale(1) rotate(-4deg); } }
+  @keyframes crBlink { 0%, 48% { opacity: 1; } 49%, 100% { opacity: 0; } }
+  @keyframes crPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.42; } }
+  .cr-split { opacity: 0; animation: crSplitIn 240ms cubic-bezier(0.22,0.61,0.36,1) forwards; }
+  .cr-pr { animation: crPrSettle 340ms cubic-bezier(0.22,0.61,0.36,1); }
+  .cr-cursor { display: inline-block; width: 2px; height: 1.15em; background: oklch(0.65 0.16 250); vertical-align: text-bottom; margin-left: 1px; animation: crBlink 1.06s steps(1) infinite; }
+  .cr-skel { animation: crPulse 1.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .cr-split { opacity: 1 !important; animation: none !important; }
+    .cr-pr, .cr-skel { animation: none !important; }
+    .cr-cursor { animation: none !important; opacity: 1 !important; }
+  }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: oklch(0.07 0 0); padding: 72px 80px 160px; display: flex; flex-direction: column; gap: 88px; align-items: flex-start;">
+
+  <div style="display: flex; align-items: baseline; gap: 20px; padding-left: 2px;">
+    <div style="display: flex; align-items: center; gap: 11px;">
+      <div style="width: 22px; height: 22px; border-radius: 5px; background: oklch(0.65 0.16 250); position: relative;">
+        <div style="position: absolute; inset: 6px; border: 2px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div>
+      </div>
+      <span style="font-weight: 600; font-size: 19px; letter-spacing: -0.01em;">CodeReps</span>
+    </div>
+    <span class="cr-mono" style="font-size: 13px; color: oklch(0.55 0.01 250); letter-spacing: 0.02em;">design system &amp; screens · dark · 1440</span>
+  </div>
+
+  <!-- ============================ DESIGN SYSTEM SHEET ============================ -->
+  <section id="system" data-screen-label="Design System" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>DESIGN SYSTEM
+    </div>
+
+    <div style="width: 1440px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; padding: 44px 48px 52px; display: flex; flex-direction: column; gap: 46px;">
+
+      <div style="display: flex; flex-direction: column; gap: 8px; max-width: 760px;">
+        <h1 style="margin: 0; font-weight: 600; font-size: 33px; letter-spacing: -0.02em; line-height: 1.1;">The instrument kit</h1>
+        <p style="margin: 0; color: oklch(0.65 0.01 250); font-size: 16px; line-height: 1.55;">Precision equipment for training code fluency. Calm, exact, dark-only. Every metric reads like a timing device — JetBrains&nbsp;Mono, tabular figures. Cobalt is the only signal color; chalk-amber is rarer still.</p>
+      </div>
+
+      <!-- COLOR -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid oklch(0.20 0.006 250); padding-bottom: 12px;">
+          <h2 style="margin: 0; font-weight: 500; font-size: 19px;">Color</h2>
+          <span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250);">OKLCH only · no hex</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.10 0 0); border: 1px solid oklch(0.24 0.006 250);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">bg</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.10 0 0</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">iron black</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.145 0.004 250); border: 1px solid oklch(0.24 0.006 250);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">surface</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.145 .004 250</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">panels, rail</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.18 0.006 250); border: 1px solid oklch(0.24 0.006 250);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">raised</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.18 .006 250</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">gutter, hover</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.93 0.005 250); border: 1px solid oklch(0.24 0.006 250);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">ink</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.93 .005 250</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">body text</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.65 0.01 250); border: 1px solid oklch(0.24 0.006 250);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">muted</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.65 .01 250</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">secondary</span></div></div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.65 0.16 250);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">primary</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.65 .16 250</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">cobalt · signal</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.84 0.13 85);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">accent</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.84 .13 85</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">chalk amber</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.72 0.15 150);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">pass</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.72 .15 150</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">verdict pass</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.62 0.19 25);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">fail</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.62 .19 25</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">verdict fail</span></div></div>
+            <div style="display: flex; flex-direction: column; gap: 9px;"><div style="height: 72px; border-radius: 7px; background: oklch(0.75 0.14 85);"></div><div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-weight: 500; font-size: 13px;">timeout</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">0.75 .14 85</span><span style="font-size: 11px; color: oklch(0.5 0.01 250);">over par</span></div></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 20px; padding-top: 4px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-weight: 500; font-size: 13px;">Heatmap ramp</span>
+              <span style="font-size: 12px; color: oklch(0.55 0.01 250); max-width: 200px; line-height: 1.4;">5 cobalt steps — surface toward primary. Explicitly not GitHub green.</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <div style="width: 46px; height: 46px; border-radius: 5px; background: oklch(0.165 0.006 250); border: 1px solid oklch(0.24 0.006 250);"></div>
+              <div style="width: 46px; height: 46px; border-radius: 5px; background: oklch(0.31 0.06 250);"></div>
+              <div style="width: 46px; height: 46px; border-radius: 5px; background: oklch(0.43 0.10 250);"></div>
+              <div style="width: 46px; height: 46px; border-radius: 5px; background: oklch(0.54 0.14 250);"></div>
+              <div style="width: 46px; height: 46px; border-radius: 5px; background: oklch(0.65 0.16 250);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TYPE -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid oklch(0.20 0.006 250); padding-bottom: 12px;">
+          <h2 style="margin: 0; font-weight: 500; font-size: 19px;">Type</h2>
+          <span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250);">IBM Plex Sans · JetBrains Mono · ratio 1.2</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: baseline; gap: 12px;"><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.01em;">IBM Plex Sans</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.55 0.01 250);">UI · 400 500 600</span></div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <span style="font-weight: 400; font-size: 16px;">Regular — implement it from memory, no autocomplete.</span>
+              <span style="font-weight: 500; font-size: 16px;">Medium — labels, buttons, active states.</span>
+              <span style="font-weight: 600; font-size: 16px;">Semibold — verdicts and headings.</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: baseline; gap: 12px;"><span class="cr-mono" style="font-size: 28px; font-weight: 500;">JetBrains Mono</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.55 0.01 250);">code + all numerals</span></div>
+            <div style="display: flex; flex-direction: column; gap: 7px;">
+              <span class="cr-mono" style="font-size: 20px; letter-spacing: 0.02em;">0 1 2 3 4 5 6 7 8 9</span>
+              <div style="display: flex; align-items: baseline; gap: 16px;">
+                <span class="cr-mono" style="font-size: 20px; color: oklch(0.93 0.005 250);">3:07</span>
+                <span class="cr-mono" style="font-size: 20px; color: oklch(0.72 0.15 150);">&minus;0:24</span>
+                <span class="cr-mono" style="font-size: 20px; color: oklch(0.84 0.13 85);">88</span>
+                <span class="cr-mono" style="font-size: 20px; color: oklch(0.65 0.01 250);">FAULTS&nbsp;00</span>
+              </div>
+              <span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250);">tabular figures — readouts stay column-aligned</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; border: 1px solid oklch(0.20 0.006 250); border-radius: 8px; overflow: hidden;">
+          <div style="display: flex; align-items: baseline; gap: 20px; padding: 14px 20px;"><span style="flex: 1; font-size: 40px; font-weight: 600; letter-spacing: -0.02em; line-height: 1;">Timer</span><span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250); width: 210px;">display · 2.49rem / 40px</span></div>
+          <div style="display: flex; align-items: baseline; gap: 20px; padding: 14px 20px; background: oklch(0.115 0.004 250);"><span style="flex: 1; font-size: 33px; font-weight: 600; letter-spacing: -0.015em; line-height: 1;">Verdict line</span><span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250); width: 210px;">display-sm · 2.07rem / 33px</span></div>
+          <div style="display: flex; align-items: baseline; gap: 20px; padding: 14px 20px;"><span style="flex: 1; font-size: 23px; font-weight: 600; line-height: 1;">Section heading</span><span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250); width: 210px;">heading · 1.44rem / 23px</span></div>
+          <div style="display: flex; align-items: baseline; gap: 20px; padding: 14px 20px; background: oklch(0.115 0.004 250);"><span style="flex: 1; font-size: 19px; font-weight: 500; line-height: 1;">Subhead</span><span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250); width: 210px;">subhead · 1.2rem / 19px</span></div>
+          <div style="display: flex; align-items: baseline; gap: 20px; padding: 14px 20px;"><span style="flex: 1; font-size: 16px; line-height: 1;">Body copy — the prompt, the spec, the reading surface.</span><span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250); width: 210px;">body · 1rem / 16px</span></div>
+          <div style="display: flex; align-items: baseline; gap: 20px; padding: 14px 20px; background: oklch(0.115 0.004 250);"><span style="flex: 1; font-size: 13px; color: oklch(0.65 0.01 250); line-height: 1;">Caption &amp; meta labels</span><span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250); width: 210px;">small · 0.83rem / 13px</span></div>
+        </div>
+      </div>
+
+      <!-- SPACING -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid oklch(0.20 0.006 250); padding-bottom: 12px;">
+          <h2 style="margin: 0; font-weight: 500; font-size: 19px;">Spacing</h2>
+          <span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250);">4px base · fixed rem</span>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 22px;">
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 4px; height: 4px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">4</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 8px; height: 8px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">8</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 12px; height: 12px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">12</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 16px; height: 16px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">16</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 24px; height: 24px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">24</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 32px; height: 32px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">32</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 48px; height: 48px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">48</span></div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><div style="width: 64px; height: 64px; background: oklch(0.65 0.16 250); border-radius: 2px;"></div><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">64</span></div>
+        </div>
+      </div>
+
+      <!-- COMPONENTS -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid oklch(0.20 0.006 250); padding-bottom: 12px;">
+          <h2 style="margin: 0; font-weight: 500; font-size: 19px;">Components</h2>
+          <span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250);">6px radius · one shape family · focus ring 2px cobalt</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;">
+
+          <!-- primary buttons -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250);">PRIMARY · SUBMIT</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 10px 18px; cursor: pointer;">Submit</button>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250); background: oklch(0.70 0.16 250); border: none; border-radius: 6px; padding: 10px 18px;">Submit</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">hover</span></span>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250); background: oklch(0.59 0.15 250); border: none; border-radius: 6px; padding: 10px 18px;">Submit</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">active</span></span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 10px 18px; box-shadow: 0 0 0 2px oklch(0.10 0 0), 0 0 0 4px oklch(0.65 0.16 250);">Submit</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">focus</span></span>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button disabled style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.5 0.01 250); background: oklch(0.20 0.006 250); border: none; border-radius: 6px; padding: 10px 18px; cursor: not-allowed;">Submit</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">disabled</span></span>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250 / 0.85); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 10px 18px; display: flex; align-items: center; gap: 8px;"><span class="cr-skel" style="width: 12px; height: 12px; border: 2px solid oklch(0.98 0.005 250 / 0.4); border-top-color: oklch(0.98 0.005 250); border-radius: 50%; display: inline-block;"></span>Submitting</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">loading</span></span>
+            </div>
+          </div>
+
+          <!-- secondary + ghost -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250);">SECONDARY · RUN &amp; GHOST</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.18 0.006 250); border: 1px solid oklch(0.28 0.008 250); border-radius: 6px; padding: 10px 18px; cursor: pointer;">Run</button>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.96 0.005 250); background: oklch(0.22 0.008 250); border: 1px solid oklch(0.34 0.01 250); border-radius: 6px; padding: 10px 18px;">Run</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">hover</span></span>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.18 0.006 250); border: 1px solid oklch(0.28 0.008 250); border-radius: 6px; padding: 10px 18px; box-shadow: 0 0 0 2px oklch(0.10 0 0), 0 0 0 4px oklch(0.65 0.16 250);">Run</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">focus</span></span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.65 0.01 250); background: transparent; border: none; border-radius: 6px; padding: 10px 14px; cursor: pointer;">Skip rep</button>
+              <span style="display: flex; flex-direction: column; align-items: center; gap: 6px;"><button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.18 0.006 250); border: none; border-radius: 6px; padding: 10px 14px;">Skip rep</button><span class="cr-mono" style="font-size: 10px; color: oklch(0.5 0.01 250);">hover</span></span>
+            </div>
+          </div>
+
+          <!-- status pills -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250);">VERDICT · ICON + WORD ALWAYS</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+              <span style="display: inline-flex; align-items: center; gap: 7px; background: oklch(0.72 0.15 150 / 0.14); border: 1px solid oklch(0.72 0.15 150 / 0.4); color: oklch(0.78 0.15 150); border-radius: 6px; padding: 7px 12px; font-weight: 500; font-size: 13px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>PASS</span>
+              <span style="display: inline-flex; align-items: center; gap: 7px; background: oklch(0.62 0.19 25 / 0.14); border: 1px solid oklch(0.62 0.19 25 / 0.42); color: oklch(0.72 0.18 25); border-radius: 6px; padding: 7px 12px; font-weight: 500; font-size: 13px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>FAIL</span>
+              <span style="display: inline-flex; align-items: center; gap: 7px; background: oklch(0.75 0.14 85 / 0.14); border: 1px solid oklch(0.75 0.14 85 / 0.42); color: oklch(0.82 0.13 85); border-radius: 6px; padding: 7px 12px; font-weight: 500; font-size: 13px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8.5" r="5.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 5.5V8.5L10 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>TIMEOUT</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 2px;">
+              <span class="cr-mono" style="font-size: 13px; color: oklch(0.65 0.01 250); letter-spacing: 0.04em;">FAULTS 00</span>
+              <span class="cr-mono" style="font-size: 13px; color: oklch(0.84 0.13 85); letter-spacing: 0.04em;">FAULTS 03</span>
+              <span class="cr-pr" style="display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid oklch(0.84 0.13 85); color: oklch(0.84 0.13 85); border-radius: 6px; padding: 5px 10px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.14em;">PR</span>
+            </div>
+          </div>
+
+          <!-- segmented -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250);">SEGMENTED CONTROL</span>
+            <div style="display: inline-flex; background: oklch(0.145 0.004 250); border: 1px solid oklch(0.24 0.006 250); border-radius: 6px; padding: 3px; gap: 2px; width: fit-content;">
+              <span style="font-size: 13px; font-weight: 500; color: oklch(0.96 0.005 250); background: oklch(0.24 0.01 250); border-radius: 4px; padding: 6px 14px;">All</span>
+              <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 14px;">React</span>
+              <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 14px;">TS</span>
+              <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 14px;">Algo</span>
+            </div>
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250); margin-top: 4px;">DIFFICULTY · REP DOTS</span>
+            <div style="display: flex; gap: 16px; align-items: center;">
+              <span style="display: inline-flex; gap: 4px; align-items: center;"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.30 0.01 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.30 0.01 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.30 0.01 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.30 0.01 250);"></span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250); margin-left: 4px;">D1</span></span>
+              <span style="display: inline-flex; gap: 4px; align-items: center;"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.30 0.01 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.30 0.01 250);"></span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250); margin-left: 4px;">D3</span></span>
+              <span style="display: inline-flex; gap: 4px; align-items: center;"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250); margin-left: 4px;">D5</span></span>
+            </div>
+          </div>
+
+          <!-- input field -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250);">INPUT · SEARCH</span>
+            <input type="text" value="debounce" readonly style="font-family: inherit; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.145 0.004 250); border: 1px solid oklch(0.28 0.008 250); border-radius: 6px; padding: 9px 12px; width: 100%;" />
+            <input type="text" value="debounce" readonly style="font-family: inherit; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.145 0.004 250); border: 1px solid oklch(0.65 0.16 250); border-radius: 6px; padding: 9px 12px; width: 100%; box-shadow: 0 0 0 2px oklch(0.65 0.16 250 / 0.3);" />
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <input type="text" value="deboonce" readonly style="font-family: inherit; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.145 0.004 250); border: 1px solid oklch(0.62 0.19 25); border-radius: 6px; padding: 9px 12px; width: 100%;" />
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: oklch(0.72 0.18 25);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5V8.5M8 11h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>No challenge matches that name.</span>
+            </div>
+          </div>
+
+          <!-- skeleton -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250);">LOADING · SKELETON (NO SPINNERS)</span>
+            <div style="display: flex; flex-direction: column; gap: 10px; padding: 4px 0;">
+              <div class="cr-skel" style="height: 12px; width: 60%; background: oklch(0.18 0.006 250); border-radius: 4px;"></div>
+              <div class="cr-skel" style="height: 12px; width: 90%; background: oklch(0.18 0.006 250); border-radius: 4px;"></div>
+              <div class="cr-skel" style="height: 12px; width: 78%; background: oklch(0.18 0.006 250); border-radius: 4px;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================ PRACTICE 1440 ============================ -->
+  <section id="practice" data-screen-label="Practice — 1440" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>PRACTICE · 1440 · A REP IN PROGRESS
+      <span style="color: oklch(0.42 0.01 250);">— click into the editor: chrome recedes, keystrokes count, paste is a fault</span>
+    </div>
+
+    <div style="width: 1440px; height: 812px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <!-- top bar -->
+      <div style="height: 52px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; transition: opacity 220ms ease-out;" data-cr-chrome>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <div style="width: 18px; height: 18px; border-radius: 4px; background: oklch(0.65 0.16 250); position: relative;"><div style="position: absolute; inset: 5px; border: 1.6px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div>
+            <span style="font-weight: 600; font-size: 15px; letter-spacing: -0.01em;">CodeReps</span>
+          </div>
+          <span style="width: 1px; height: 18px; background: oklch(0.24 0.006 250);"></span>
+          <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.6 0.01 250);">Warmup&nbsp; · &nbsp;Rep <span style="color: oklch(0.88 0.005 250);">2</span> of 3</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="14" height="15" viewBox="0 0 14 16" fill="none"><path d="M7 1.2C7.6 3.4 9.4 4.2 9.4 6.4c0 .5-.15.95-.4 1.32.8-.2 1.3-.9 1.5-1.5C11.7 7.5 12 9 12 10.2 12 13 9.8 15 7 15S2 13 2 10.2c0-2.5 1.7-3.6 2.1-6C5.4 5 5.6 6 6.2 6.4 5.6 4 6.1 2.4 7 1.2Z" fill="oklch(0.84 0.13 85)"/></svg>
+            <span class="cr-mono" style="font-size: 13px; color: oklch(0.84 0.13 85); letter-spacing: 0.02em;">14</span>
+          </span>
+          <span style="width: 1px; height: 18px; background: oklch(0.24 0.006 250);"></span>
+          <div style="width: 26px; height: 26px; border-radius: 50%; background: oklch(0.22 0.02 250); border: 1px solid oklch(0.3 0.02 250); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: oklch(0.8 0.02 250);">JK</div>
+        </div>
+      </div>
+
+      <!-- three zones -->
+      <div style="flex: 1; display: flex; min-height: 0;">
+
+        <!-- PROMPT PANEL -->
+        <div style="width: 336px; flex-shrink: 0; background: oklch(0.128 0.004 250); border-right: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; transition: opacity 220ms ease-out;" data-cr-chrome>
+          <div style="padding: 22px 22px 18px; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <h1 style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.01em;">Debounce</h1>
+              <button style="background: transparent; border: none; color: oklch(0.55 0.01 250); cursor: pointer; padding: 4px; display: flex;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3.5L5.5 8L10 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 12px; color: oklch(0.82 0.02 250); background: oklch(0.18 0.006 250); border: 1px solid oklch(0.26 0.006 250); border-radius: 5px; padding: 3px 9px;">JavaScript</span>
+              <span style="font-size: 12px; color: oklch(0.82 0.02 250); background: oklch(0.18 0.006 250); border: 1px solid oklch(0.26 0.006 250); border-radius: 5px; padding: 3px 9px;">Timing</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; margin-left: 2px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span>
+                <span class="cr-mono" style="font-size: 11px; color: oklch(0.62 0.01 250); margin-left: 3px;">D3</span>
+              </span>
+            </div>
+          </div>
+          <div style="padding: 20px 22px; display: flex; flex-direction: column; gap: 22px; flex: 1; overflow: auto;">
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.62; color: oklch(0.86 0.005 250);">Write a debounce utility from memory. It wraps a function and delays running it until the calls have been quiet for a set interval.</p>
+            <div style="display: flex; flex-direction: column; gap: 11px;">
+              <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.08em; color: oklch(0.58 0.01 250);">REQUIREMENTS</span>
+              <div style="display: flex; gap: 10px; align-items: flex-start;"><span style="width: 5px; height: 5px; background: oklch(0.65 0.16 250); margin-top: 8px; flex-shrink: 0; transform: rotate(45deg);"></span><span style="font-size: 13.5px; line-height: 1.5; color: oklch(0.82 0.005 250);">Take <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.88 0.02 250);">fn</span> and <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.88 0.02 250);">wait</span> (ms); return a new debounced function.</span></div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;"><span style="width: 5px; height: 5px; background: oklch(0.65 0.16 250); margin-top: 8px; flex-shrink: 0; transform: rotate(45deg);"></span><span style="font-size: 13.5px; line-height: 1.5; color: oklch(0.82 0.005 250);">Each call resets the timer; fn runs once, <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.88 0.02 250);">wait</span> ms after the last call.</span></div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;"><span style="width: 5px; height: 5px; background: oklch(0.65 0.16 250); margin-top: 8px; flex-shrink: 0; transform: rotate(45deg);"></span><span style="font-size: 13.5px; line-height: 1.5; color: oklch(0.82 0.005 250);">Preserve <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.88 0.02 250);">this</span> and all arguments when fn finally runs.</span></div>
+              <div style="display: flex; gap: 10px; align-items: flex-start;"><span style="width: 5px; height: 5px; background: oklch(0.65 0.16 250); margin-top: 8px; flex-shrink: 0; transform: rotate(45deg);"></span><span style="font-size: 13.5px; line-height: 1.5; color: oklch(0.82 0.005 250);">Support a <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.88 0.02 250);">leading</span> option: fire on the first call, then stay quiet.</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.08em; color: oklch(0.58 0.01 250);">BEHAVES LIKE</span>
+              <p style="margin: 0; font-size: 13px; line-height: 1.55; color: oklch(0.66 0.01 250);">Called 5&times; within 100ms with <span class="cr-mono" style="font-size: 12px; color: oklch(0.78 0.02 250);">wait = 200</span> → fn runs <span style="color: oklch(0.82 0.005 250);">once</span>, 200ms after the last call.</p>
+            </div>
+          </div>
+          <div style="padding: 13px 22px; border-top: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; gap: 8px; background: oklch(0.115 0.004 250);">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="3.5" y="7" width="9" height="6.5" rx="1.3" stroke="oklch(0.58 0.01 250)" stroke-width="1.3"/><path d="M5.3 7V5.2a2.7 2.7 0 015.4 0V7" stroke="oklch(0.58 0.01 250)" stroke-width="1.3"/></svg>
+            <span class="cr-mono" style="font-size: 10.5px; color: oklch(0.58 0.01 250); letter-spacing: -0.005em; white-space: nowrap;">No libraries · No autocomplete · No paste</span>
+          </div>
+        </div>
+
+        <!-- EDITOR -->
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: oklch(0.112 0.003 250);">
+          <div style="height: 42px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: stretch; padding-left: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 2px solid oklch(0.65 0.16 250); margin-bottom: -1px;">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M5 2h4l3 3v9H4V2z" stroke="oklch(0.7 0.02 250)" stroke-width="1.2" fill="none"/><path d="M9 2v3h3" stroke="oklch(0.7 0.02 250)" stroke-width="1.2"/></svg>
+              <span class="cr-mono" style="font-size: 13px; color: oklch(0.9 0.005 250);">debounce.js</span>
+            </div>
+            <div style="flex: 1;"></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding-right: 16px;">
+              <span style="display: inline-flex; align-items: center; gap: 5px; border: 1px solid oklch(0.24 0.006 250); border-radius: 5px; padding: 3px 8px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: oklch(0.6 0.01 250);"></span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">AI OFF</span></span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; border: 1px solid oklch(0.24 0.006 250); border-radius: 5px; padding: 3px 8px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: oklch(0.6 0.01 250);"></span><span class="cr-mono" style="font-size: 11px; color: oklch(0.6 0.01 250);">PASTE OFF</span></span>
+            </div>
+          </div>
+          <div style="flex: 1; display: flex; min-height: 0; overflow: hidden;">
+            <div aria-hidden="true" style="flex-shrink: 0; width: 54px; padding: 16px 12px 16px 0; text-align: right; user-select: none; background: oklch(0.128 0.004 250); border-right: 1px solid oklch(0.16 0.005 250); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 22px; color: oklch(0.4 0.01 250);"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div style="color: oklch(0.75 0.02 250);">8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div></div>
+            <div contenteditable="true" spellcheck="false" ref="{{ bindEditor }}" style="flex: 1; min-width: 0; padding: 16px 0 16px 20px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 22px; white-space: pre; color: oklch(0.9 0.005 250); tab-size: 2;"><div style="color: oklch(0.5 0.01 250);">// debounce.js — implement from memory</div><div><span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.8 0.09 230);">debounce</span><span style="color: oklch(0.6 0.01 250);">(</span>fn<span style="color: oklch(0.6 0.01 250);">,</span> wait<span style="color: oklch(0.6 0.01 250);">,</span> <span style="color: oklch(0.6 0.01 250);">{</span> leading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">false</span> <span style="color: oklch(0.6 0.01 250);">}</span> <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.6 0.01 250);">{}</span><span style="color: oklch(0.6 0.01 250);">)</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> timer <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">null</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> ranLeading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">false</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div> </div><div>  <span style="color: oklch(0.72 0.11 265);">return</span> <span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.6 0.01 250);">(</span><span style="color: oklch(0.6 0.01 250);">...</span>args<span style="color: oklch(0.6 0.01 250);">)</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>    <span style="color: oklch(0.72 0.11 265);">const</span> ctx <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.72 0.11 265);">this</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div style="background: oklch(0.165 0.006 250); margin: 0 -20px 0 -20px; padding: 0 20px;">    <span style="color: oklch(0.72 0.11 265);">const</span> callNow <span style="color: oklch(0.6 0.01 250);">=</span> leading <span style="color: oklch(0.6 0.01 250);">&amp;&amp;</span> <span style="color: oklch(0.6 0.01 250);">!</span>timer<span style="color: oklch(0.6 0.01 250);">;</span><span class="cr-cursor"></span></div><div> </div><div>    <span style="color: oklch(0.8 0.09 230);">clearTimeout</span><span style="color: oklch(0.6 0.01 250);">(</span>timer<span style="color: oklch(0.6 0.01 250);">)</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>    timer <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.09 230);">setTimeout</span><span style="color: oklch(0.6 0.01 250);">(</span><span style="color: oklch(0.6 0.01 250);">() =&gt;</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>      timer <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">null</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>      <span style="color: oklch(0.72 0.11 265);">if</span> <span style="color: oklch(0.6 0.01 250);">(</span><span style="color: oklch(0.6 0.01 250);">!</span>leading<span style="color: oklch(0.6 0.01 250);">)</span> fn<span style="color: oklch(0.6 0.01 250);">.</span><span style="color: oklch(0.8 0.09 230);">apply</span><span style="color: oklch(0.6 0.01 250);">(</span>ctx<span style="color: oklch(0.6 0.01 250);">,</span> args<span style="color: oklch(0.6 0.01 250);">)</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>      ranLeading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">false</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>    <span style="color: oklch(0.6 0.01 250);">}</span><span style="color: oklch(0.6 0.01 250);">,</span> wait<span style="color: oklch(0.6 0.01 250);">)</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div> </div><div>    <span style="color: oklch(0.72 0.11 265);">if</span> <span style="color: oklch(0.6 0.01 250);">(</span>callNow<span style="color: oklch(0.6 0.01 250);">)</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>      fn<span style="color: oklch(0.6 0.01 250);">.</span><span style="color: oklch(0.8 0.09 230);">apply</span><span style="color: oklch(0.6 0.01 250);">(</span>ctx<span style="color: oklch(0.6 0.01 250);">,</span> args<span style="color: oklch(0.6 0.01 250);">)</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>      ranLeading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">true</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>    <span style="color: oklch(0.6 0.01 250);">}</span></div><div>  <span style="color: oklch(0.6 0.01 250);">}</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div><span style="color: oklch(0.6 0.01 250);">}</span></div></div>
+          </div>
+          <div style="height: 32px; flex-shrink: 0; border-top: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; background: oklch(0.10 0 0);">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="cr-mono" style="font-size: 11.5px; color: oklch(0.58 0.01 250);">Ln 8, Col 34</span>
+              <span class="cr-mono" style="font-size: 11.5px; color: oklch(0.58 0.01 250);">Spaces: 2</span>
+              <span class="cr-mono" style="font-size: 11.5px; color: oklch(0.58 0.01 250);">JavaScript</span>
+            </div>
+            <span class="cr-mono" style="font-size: 11.5px; color: oklch(0.5 0.01 250);">no autocomplete</span>
+          </div>
+        </div>
+
+        <!-- SESSION RAIL -->
+        <div style="width: 284px; flex-shrink: 0; background: oklch(0.145 0.004 250); border-left: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column;">
+          <div style="padding: 24px 22px 22px; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; gap: 4px;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.1em; color: oklch(0.55 0.01 250);">ELAPSED</span>
+            <span class="cr-mono" data-cr-timer style="font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; color: oklch(0.93 0.005 250);">3:07</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+              <span class="cr-mono" style="font-size: 13px; color: oklch(0.6 0.01 250); letter-spacing: 0.02em;">PAR 4:00</span>
+              <span class="cr-mono" style="font-size: 12px; color: oklch(0.55 0.01 250);">D3</span>
+            </div>
+            <div style="height: 4px; border-radius: 2px; background: oklch(0.2 0.006 250); margin-top: 7px; overflow: hidden;"><div data-cr-bar style="height: 100%; width: 78%; background: oklch(0.65 0.16 250); border-radius: 2px; transition: width 400ms linear;"></div></div>
+          </div>
+
+          <div style="padding: 20px 22px; display: flex; flex-direction: column; gap: 15px; transition: opacity 220ms ease-out;" data-cr-chrome>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span class="cr-mono" style="font-size: 11px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">CATEGORY</span><span style="font-size: 13px; color: oklch(0.85 0.005 250);">JavaScript · Timing</span></div>
+            <div style="height: 1px; background: oklch(0.18 0.006 250);"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span class="cr-mono" style="font-size: 11px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">KEYSTROKES</span><span class="cr-mono" data-cr-ks style="font-size: 15px; color: oklch(0.9 0.005 250);">342</span></div>
+            <div style="height: 1px; background: oklch(0.18 0.006 250);"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span class="cr-mono" style="font-size: 11px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">FAULTS</span><span class="cr-mono" data-cr-fault style="font-size: 15px; letter-spacing: 0.04em; color: oklch(0.65 0.01 250);">00</span></div>
+          </div>
+
+          <div style="flex: 1;"></div>
+
+          <div style="padding: 20px 22px; border-top: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; gap: 10px; transition: opacity 220ms ease-out;" data-cr-chrome>
+            <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.93 0.005 250); background: oklch(0.18 0.006 250); border: 1px solid oklch(0.28 0.008 250); border-radius: 6px; padding: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" style-hover="background: oklch(0.22 0.008 250); border-color: oklch(0.34 0.01 250);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 3l9 5-9 5V3z" fill="currentColor"/></svg>Run tests</button>
+            <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 11px; cursor: pointer;" style-hover="background: oklch(0.70 0.16 250);" style-active="background: oklch(0.59 0.15 250);" style-focus="box-shadow: 0 0 0 2px oklch(0.145 0.004 250), 0 0 0 4px oklch(0.65 0.16 250); outline: none;">Submit rep</button>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 3px;">
+              <span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250);">⌘↵ submit</span>
+              <span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250);">⌘R run</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PRACTICE 1024 ============================ -->
+  <section id="practice-1024" data-screen-label="Practice — 1024" style="display: flex; flex-direction: column; gap: 16px; width: 1024px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>PRACTICE · 1024 · PROMPT COLLAPSED, EDITOR STAYS DOMINANT
+    </div>
+
+    <div style="width: 1024px; height: 680px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 48px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 18px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 17px; height: 17px; border-radius: 4px; background: oklch(0.65 0.16 250); position: relative;"><div style="position: absolute; inset: 5px; border: 1.5px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div>
+            <span style="font-weight: 600; font-size: 14px; letter-spacing: -0.01em;">CodeReps</span>
+          </div>
+          <span style="width: 1px; height: 16px; background: oklch(0.24 0.006 250);"></span>
+          <span class="cr-mono" style="font-size: 12px; color: oklch(0.6 0.01 250);">Rep <span style="color: oklch(0.88 0.005 250);">2</span> of 3</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="13" height="14" viewBox="0 0 14 16" fill="none"><path d="M7 1.2C7.6 3.4 9.4 4.2 9.4 6.4c0 .5-.15.95-.4 1.32.8-.2 1.3-.9 1.5-1.5C11.7 7.5 12 9 12 10.2 12 13 9.8 15 7 15S2 13 2 10.2c0-2.5 1.7-3.6 2.1-6C5.4 5 5.6 6 6.2 6.4 5.6 4 6.1 2.4 7 1.2Z" fill="oklch(0.84 0.13 85)"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.84 0.13 85);">14</span></span>
+          <div style="width: 24px; height: 24px; border-radius: 50%; background: oklch(0.22 0.02 250); border: 1px solid oklch(0.3 0.02 250); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: oklch(0.8 0.02 250);">JK</div>
+        </div>
+      </div>
+
+      <div style="flex: 1; display: flex; min-height: 0;">
+
+        <!-- collapsed prompt -->
+        <div style="width: 46px; flex-shrink: 0; background: oklch(0.128 0.004 250); border-right: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 16px;">
+          <button style="background: oklch(0.18 0.006 250); border: 1px solid oklch(0.26 0.006 250); border-radius: 6px; color: oklch(0.7 0.01 250); cursor: pointer; padding: 6px; display: flex;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div style="writing-mode: vertical-rl; transform: rotate(180deg); display: flex; align-items: center; gap: 12px; margin-top: 4px;">
+            <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: oklch(0.72 0.01 250);">Debounce</span>
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.1em; color: oklch(0.5 0.01 250);">PROMPT</span>
+          </div>
+          <div style="flex: 1;"></div>
+          <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></div>
+        </div>
+
+        <!-- editor (dominant) -->
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: oklch(0.112 0.003 250);">
+          <div style="height: 40px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: stretch; padding-left: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 0 15px; border-bottom: 2px solid oklch(0.65 0.16 250); margin-bottom: -1px;"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M5 2h4l3 3v9H4V2z" stroke="oklch(0.7 0.02 250)" stroke-width="1.2" fill="none"/><path d="M9 2v3h3" stroke="oklch(0.7 0.02 250)" stroke-width="1.2"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.9 0.005 250);">debounce.js</span></div>
+            <div style="flex: 1;"></div>
+            <div style="display: flex; align-items: center; gap: 8px; padding-right: 14px;">
+              <span style="display: inline-flex; align-items: center; gap: 5px; border: 1px solid oklch(0.24 0.006 250); border-radius: 5px; padding: 3px 7px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: oklch(0.6 0.01 250);"></span><span class="cr-mono" style="font-size: 10.5px; color: oklch(0.6 0.01 250);">AI OFF</span></span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; border: 1px solid oklch(0.24 0.006 250); border-radius: 5px; padding: 3px 7px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: oklch(0.6 0.01 250);"></span><span class="cr-mono" style="font-size: 10.5px; color: oklch(0.6 0.01 250);">PASTE OFF</span></span>
+            </div>
+          </div>
+          <div style="flex: 1; display: flex; min-height: 0; overflow: hidden;">
+            <div aria-hidden="true" style="flex-shrink: 0; width: 50px; padding: 16px 12px 16px 0; text-align: right; user-select: none; background: oklch(0.128 0.004 250); border-right: 1px solid oklch(0.16 0.005 250); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 22px; color: oklch(0.4 0.01 250);"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div style="color: oklch(0.75 0.02 250);">13</div></div>
+            <div contenteditable="true" spellcheck="false" ref="{{ bindEditor }}" style="flex: 1; min-width: 0; padding: 16px 0 16px 20px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 22px; white-space: pre; color: oklch(0.9 0.005 250); tab-size: 2;"><div style="color: oklch(0.5 0.01 250);">// debounce.js — implement from memory</div><div><span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.8 0.09 230);">debounce</span><span style="color: oklch(0.6 0.01 250);">(</span>fn<span style="color: oklch(0.6 0.01 250);">,</span> wait<span style="color: oklch(0.6 0.01 250);">,</span> <span style="color: oklch(0.6 0.01 250);">{</span> leading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">false</span> <span style="color: oklch(0.6 0.01 250);">}</span> <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.6 0.01 250);">{})</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> timer <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">null</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> ranLeading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">false</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div> </div><div>  <span style="color: oklch(0.72 0.11 265);">return</span> <span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.6 0.01 250);">(</span><span style="color: oklch(0.6 0.01 250);">...</span>args<span style="color: oklch(0.6 0.01 250);">)</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>    <span style="color: oklch(0.72 0.11 265);">const</span> ctx <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.72 0.11 265);">this</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>    <span style="color: oklch(0.72 0.11 265);">const</span> callNow <span style="color: oklch(0.6 0.01 250);">=</span> leading <span style="color: oklch(0.6 0.01 250);">&amp;&amp;</span> <span style="color: oklch(0.6 0.01 250);">!</span>timer<span style="color: oklch(0.6 0.01 250);">;</span></div><div> </div><div>    <span style="color: oklch(0.8 0.09 230);">clearTimeout</span><span style="color: oklch(0.6 0.01 250);">(</span>timer<span style="color: oklch(0.6 0.01 250);">)</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div>    timer <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.09 230);">setTimeout</span><span style="color: oklch(0.6 0.01 250);">(</span><span style="color: oklch(0.6 0.01 250);">() =&gt;</span> <span style="color: oklch(0.6 0.01 250);">{</span></div><div>      timer <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">null</span><span style="color: oklch(0.6 0.01 250);">;</span></div><div style="background: oklch(0.165 0.006 250); margin: 0 -20px; padding: 0 20px;">      <span style="color: oklch(0.72 0.11 265);">if</span> <span style="color: oklch(0.6 0.01 250);">(</span><span style="color: oklch(0.6 0.01 250);">!</span>leading<span style="color: oklch(0.6 0.01 250);">)</span> fn<span style="color: oklch(0.6 0.01 250);">.</span>a<span class="cr-cursor"></span></div></div>
+          </div>
+          <div style="height: 30px; flex-shrink: 0; border-top: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; background: oklch(0.10 0 0);">
+            <div style="display: flex; align-items: center; gap: 14px;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.58 0.01 250);">Ln 13, Col 19</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.58 0.01 250);">Spaces: 2</span></div>
+            <span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250);">no autocomplete</span>
+          </div>
+        </div>
+
+        <!-- rail -->
+        <div style="width: 234px; flex-shrink: 0; background: oklch(0.145 0.004 250); border-left: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column;">
+          <div style="padding: 20px 18px; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; gap: 3px;">
+            <span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.1em; color: oklch(0.55 0.01 250);">ELAPSED</span>
+            <span class="cr-mono" data-cr-timer style="font-size: 40px; line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; color: oklch(0.93 0.005 250);">3:07</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 9px;"><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.6 0.01 250);">PAR 4:00</span><span class="cr-mono" style="font-size: 11.5px; color: oklch(0.55 0.01 250);">D3</span></div>
+            <div style="height: 4px; border-radius: 2px; background: oklch(0.2 0.006 250); margin-top: 7px; overflow: hidden;"><div data-cr-bar style="height: 100%; width: 78%; background: oklch(0.65 0.16 250); border-radius: 2px; transition: width 400ms linear;"></div></div>
+          </div>
+          <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">KEYSTROKES</span><span class="cr-mono" data-cr-ks style="font-size: 14px; color: oklch(0.9 0.005 250);">342</span></div>
+            <div style="height: 1px; background: oklch(0.18 0.006 250);"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">FAULTS</span><span class="cr-mono" data-cr-fault style="font-size: 14px; letter-spacing: 0.04em; color: oklch(0.65 0.01 250);">00</span></div>
+          </div>
+          <div style="flex: 1;"></div>
+          <div style="padding: 16px 18px; border-top: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; gap: 9px;">
+            <button style="font-family: inherit; font-weight: 500; font-size: 13.5px; color: oklch(0.93 0.005 250); background: oklch(0.18 0.006 250); border: 1px solid oklch(0.28 0.008 250); border-radius: 6px; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;" style-hover="background: oklch(0.22 0.008 250);"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 3l9 5-9 5V3z" fill="currentColor"/></svg>Run</button>
+            <button style="font-family: inherit; font-weight: 500; font-size: 13.5px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 10px; cursor: pointer;" style-hover="background: oklch(0.70 0.16 250);" style-focus="box-shadow: 0 0 0 2px oklch(0.145 0.004 250), 0 0 0 4px oklch(0.65 0.16 250); outline: none;">Submit rep</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ RESULTS / DEBRIEF ============================ -->
+  <section id="results" data-screen-label="Results — Debrief" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>RESULTS · DEBRIEF · READS LIKE A RACE RESULT
+    </div>
+
+    <div style="width: 1440px; height: 872px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 52px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 24px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button style="display: flex; align-items: center; gap: 7px; background: transparent; border: none; color: oklch(0.6 0.01 250); font-family: inherit; font-size: 13px; cursor: pointer; padding: 6px 4px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3.5L5.5 8L10 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Warmup</button>
+          <span style="width: 1px; height: 16px; background: oklch(0.24 0.006 250);"></span>
+          <span style="font-size: 14px; font-weight: 500; color: oklch(0.9 0.005 250);">Debrief</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.6 0.01 250);">Rep 2 of 3</span>
+          <button style="display: flex; align-items: center; gap: 8px; font-family: inherit; font-weight: 500; font-size: 13.5px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 9px 16px; cursor: pointer;" style-hover="background: oklch(0.70 0.16 250);">Next rep<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+
+      <div style="flex: 1; padding: 34px 40px; display: flex; flex-direction: column; gap: 26px; min-height: 0;">
+
+        <!-- verdict band -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 18px;">
+              <div style="width: 58px; height: 58px; border-radius: 10px; background: oklch(0.72 0.15 150 / 0.14); border: 1px solid oklch(0.72 0.15 150 / 0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="30" height="30" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="oklch(0.78 0.15 150)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <span style="font-size: 40px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; color: oklch(0.78 0.15 150);">PASSED</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 14px; color: oklch(0.72 0.01 250);">Debounce · JavaScript · Timing</span>
+                  <span style="display: inline-flex; gap: 3px; align-items: center;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.88 0.02 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 14px; padding-left: 2px;">
+              <span class="cr-mono" style="font-size: 30px; font-weight: 500; color: oklch(0.93 0.005 250); letter-spacing: -0.01em;">3:41</span>
+              <span class="cr-mono" style="font-size: 16px; color: oklch(0.6 0.01 250);"><span style="color: oklch(0.78 0.15 150);">−0:19</span> vs PAR 4:00</span>
+            </div>
+          </div>
+          <div class="cr-pr" style="display: flex; flex-direction: column; align-items: center; gap: 4px; border: 1.5px solid oklch(0.84 0.13 85); border-radius: 8px; padding: 12px 20px; transform: rotate(-4deg);">
+            <span class="cr-mono" style="font-size: 26px; font-weight: 700; letter-spacing: 0.14em; color: oklch(0.84 0.13 85); padding-left: 0.14em;">PR</span>
+            <span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.06em; color: oklch(0.78 0.1 85);">BEAT 4:03</span>
+          </div>
+        </div>
+
+        <div style="height: 1px; background: oklch(0.18 0.006 250);"></div>
+
+        <!-- content row -->
+        <div style="flex: 1; display: flex; gap: 30px; min-height: 0;">
+
+          <!-- left: fluency + splits -->
+          <div style="width: 400px; flex-shrink: 0; display: flex; flex-direction: column; gap: 22px;">
+            <div style="background: oklch(0.145 0.004 250); border: 1px solid oklch(0.2 0.006 250); border-radius: 8px; padding: 20px;">
+              <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.09em; color: oklch(0.55 0.01 250);">FLUENCY · THIS REP</span>
+                  <div style="display: flex; align-items: baseline; gap: 8px;"><span class="cr-mono" style="font-size: 48px; font-weight: 500; line-height: 1; color: oklch(0.93 0.005 250);">88</span><span class="cr-mono" style="font-size: 16px; color: oklch(0.55 0.01 250);">/ 100</span></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px; text-align: right;">
+                  <span class="cr-mono" style="font-size: 12px; color: oklch(0.66 0.01 250);">5 / 5 cases</span>
+                  <span class="cr-mono" style="font-size: 12px; color: oklch(0.66 0.01 250);">0.92× par</span>
+                  <span class="cr-mono" style="font-size: 12px; color: oklch(0.66 0.01 250);">0 faults · unaided</span>
+                </div>
+              </div>
+              <p style="margin: 14px 0 0; font-size: 12.5px; line-height: 1.5; color: oklch(0.55 0.01 250);">Correct on every case, under par, no hints — but one dead variable kept it off 90.</p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.09em; color: oklch(0.55 0.01 250);">TEST SPLITS</span>
+                <span class="cr-mono" style="font-size: 12px; color: oklch(0.66 0.01 250);">5 / 5 · 11 ms</span>
+              </div>
+              <div style="display: flex; flex-direction: column; border: 1px solid oklch(0.18 0.006 250); border-radius: 8px; overflow: hidden;">
+                <div class="cr-split" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; animation-delay: 0ms;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250); width: 18px;">01</span><span style="flex: 1; font-size: 13.5px; color: oklch(0.86 0.005 250);">delays until calls go quiet</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="oklch(0.78 0.15 150)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.7 0.01 250); width: 42px; text-align: right;">2 ms</span></div>
+                <div class="cr-split" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid oklch(0.16 0.005 250); animation-delay: 65ms;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250); width: 18px;">02</span><span style="flex: 1; font-size: 13.5px; color: oklch(0.86 0.005 250);">cancels the previous timer</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="oklch(0.78 0.15 150)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.7 0.01 250); width: 42px; text-align: right;">1 ms</span></div>
+                <div class="cr-split" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid oklch(0.16 0.005 250); animation-delay: 130ms;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250); width: 18px;">03</span><span style="flex: 1; font-size: 13.5px; color: oklch(0.86 0.005 250);">passes the latest arguments</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="oklch(0.78 0.15 150)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.7 0.01 250); width: 42px; text-align: right;">3 ms</span></div>
+                <div class="cr-split" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid oklch(0.16 0.005 250); animation-delay: 195ms;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250); width: 18px;">04</span><span style="flex: 1; font-size: 13.5px; color: oklch(0.86 0.005 250);">preserves <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.82 0.02 250);">this</span> binding</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="oklch(0.78 0.15 150)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.7 0.01 250); width: 42px; text-align: right;">1 ms</span></div>
+                <div class="cr-split" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid oklch(0.16 0.005 250); animation-delay: 260ms;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.5 0.01 250); width: 18px;">05</span><span style="flex: 1; font-size: 13.5px; color: oklch(0.86 0.005 250);">leading edge fires once</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="oklch(0.78 0.15 150)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.7 0.01 250); width: 42px; text-align: right;">4 ms</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- right: diff -->
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between;">
+              <div style="display: flex; gap: 8px;"><span class="cr-mono" style="font-size: 11px; letter-spacing: 0.09em; color: oklch(0.55 0.01 250);">YOUR REP</span><span class="cr-mono" style="font-size: 11px; color: oklch(0.42 0.01 250);">vs</span><span class="cr-mono" style="font-size: 11px; letter-spacing: 0.09em; color: oklch(0.55 0.01 250);">THE STANDARD</span></div>
+              <span class="cr-mono" style="font-size: 12px; color: oklch(0.66 0.01 250);">3 lines differ · both correct</span>
+            </div>
+            <div style="flex: 1; display: flex; gap: 14px; min-height: 0;">
+              <!-- your rep -->
+              <div style="flex: 1; min-width: 0; background: oklch(0.112 0.003 250); border: 1px solid oklch(0.2 0.006 250); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
+                <div style="padding: 10px 14px; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span><span class="cr-mono" style="font-size: 12px; color: oklch(0.82 0.005 250);">your solution</span></div>
+                <div style="flex: 1; padding: 14px 16px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 21px; white-space: pre; color: oklch(0.78 0.015 250);"><div><span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.8 0.09 230);">debounce</span>(fn, wait, { leading = <span style="color: oklch(0.8 0.08 85);">false</span> } = {}) {</div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> timer = <span style="color: oklch(0.8 0.08 85);">null</span>;</div><div style="background: oklch(0.84 0.13 85 / 0.1); margin: 0 -16px; padding: 0 16px;">  <span style="color: oklch(0.72 0.11 265);">let</span> ranLeading <span style="color: oklch(0.6 0.01 250);">=</span> <span style="color: oklch(0.8 0.08 85);">false</span>;</div><div>  <span style="color: oklch(0.72 0.11 265);">return</span> <span style="color: oklch(0.72 0.11 265);">function</span> (...args) {</div><div style="background: oklch(0.84 0.13 85 / 0.1); margin: 0 -16px; padding: 0 16px;">    <span style="color: oklch(0.72 0.11 265);">const</span> ctx = <span style="color: oklch(0.72 0.11 265);">this</span>;</div><div>    <span style="color: oklch(0.72 0.11 265);">const</span> callNow <span style="color: oklch(0.6 0.01 250);">=</span> leading &amp;&amp; !timer;</div><div>    <span style="color: oklch(0.8 0.09 230);">clearTimeout</span>(timer);</div><div>    timer = <span style="color: oklch(0.8 0.09 230);">setTimeout</span>(() =&gt; {</div><div>      timer = <span style="color: oklch(0.8 0.08 85);">null</span>;</div><div>      <span style="color: oklch(0.72 0.11 265);">if</span> (!leading) fn.<span style="color: oklch(0.8 0.09 230);">apply</span>(ctx, args);</div><div>    }, wait);</div><div>    <span style="color: oklch(0.72 0.11 265);">if</span> (callNow) fn.<span style="color: oklch(0.8 0.09 230);">apply</span>(ctx, args);</div><div>  };</div><div>}</div></div>
+              </div>
+              <!-- standard -->
+              <div style="flex: 1; min-width: 0; background: oklch(0.112 0.003 250); border: 1px solid oklch(0.2 0.006 250); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
+                <div style="padding: 10px 14px; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150);"></span><span class="cr-mono" style="font-size: 12px; color: oklch(0.82 0.005 250);">reference</span></div>
+                <div style="flex: 1; padding: 14px 16px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 21px; white-space: pre; color: oklch(0.78 0.015 250);"><div><span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.8 0.09 230);">debounce</span>(fn, wait, { leading = <span style="color: oklch(0.8 0.08 85);">false</span> } = {}) {</div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> timer = <span style="color: oklch(0.8 0.08 85);">null</span>;</div><div>  <span style="color: oklch(0.72 0.11 265);">return</span> <span style="color: oklch(0.72 0.11 265);">function</span> (...args) {</div><div style="background: oklch(0.72 0.15 150 / 0.1); margin: 0 -16px; padding: 0 16px;">    <span style="color: oklch(0.72 0.11 265);">const</span> callNow <span style="color: oklch(0.6 0.01 250);">=</span> leading &amp;&amp; timer === <span style="color: oklch(0.8 0.08 85);">null</span>;</div><div>    <span style="color: oklch(0.8 0.09 230);">clearTimeout</span>(timer);</div><div>    timer = <span style="color: oklch(0.8 0.09 230);">setTimeout</span>(() =&gt; {</div><div>      timer = <span style="color: oklch(0.8 0.08 85);">null</span>;</div><div style="background: oklch(0.72 0.15 150 / 0.1); margin: 0 -16px; padding: 0 16px;">      <span style="color: oklch(0.72 0.11 265);">if</span> (!leading) fn.<span style="color: oklch(0.8 0.09 230);">apply</span>(<span style="color: oklch(0.72 0.11 265);">this</span>, args);</div><div>    }, wait);</div><div style="background: oklch(0.72 0.15 150 / 0.1); margin: 0 -16px; padding: 0 16px;">    <span style="color: oklch(0.72 0.11 265);">if</span> (callNow) fn.<span style="color: oklch(0.8 0.09 230);">apply</span>(<span style="color: oklch(0.72 0.11 265);">this</span>, args);</div><div>  };</div><div>}</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ TRAINING LOG ============================ -->
+  <section id="log" data-screen-label="Training Log" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>TRAINING LOG · HONEST NUMBERS, NO GAMIFICATION
+    </div>
+
+    <div style="width: 1440px; height: 936px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 56px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 28px;">
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <div style="display: flex; align-items: center; gap: 9px;"><div style="width: 19px; height: 19px; border-radius: 4px; background: oklch(0.65 0.16 250); position: relative;"><div style="position: absolute; inset: 5px; border: 1.6px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div><span style="font-weight: 600; font-size: 15px; letter-spacing: -0.01em;">CodeReps</span></div>
+          <div style="display: flex; align-items: center; gap: 4px; height: 56px;">
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Warmup</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Practice</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; font-weight: 500; color: oklch(0.93 0.005 250); border-bottom: 2px solid oklch(0.65 0.16 250);">Log</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Library</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="15" viewBox="0 0 14 16" fill="none"><path d="M7 1.2C7.6 3.4 9.4 4.2 9.4 6.4c0 .5-.15.95-.4 1.32.8-.2 1.3-.9 1.5-1.5C11.7 7.5 12 9 12 10.2 12 13 9.8 15 7 15S2 13 2 10.2c0-2.5 1.7-3.6 2.1-6C5.4 5 5.6 6 6.2 6.4 5.6 4 6.1 2.4 7 1.2Z" fill="oklch(0.84 0.13 85)"/></svg><span class="cr-mono" style="font-size: 13px; color: oklch(0.84 0.13 85);">14</span></span>
+          <div style="width: 27px; height: 27px; border-radius: 50%; background: oklch(0.22 0.02 250); border: 1px solid oklch(0.3 0.02 250); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: oklch(0.8 0.02 250);">JK</div>
+        </div>
+      </div>
+
+      <div style="flex: 1; padding: 32px 40px; display: flex; flex-direction: column; gap: 26px; overflow: hidden;">
+
+        <!-- header + streak -->
+        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.015em;">Training log</h1>
+            <span style="font-size: 14px; color: oklch(0.62 0.01 250);">Fluency is earned and it decays. Here is where yours actually stands.</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 22px; background: oklch(0.145 0.004 250); border: 1px solid oklch(0.2 0.006 250); border-radius: 10px; padding: 16px 22px;">
+            <div style="display: flex; align-items: center; gap: 13px;">
+              <svg width="26" height="30" viewBox="0 0 14 16" fill="none"><path d="M7 1.2C7.6 3.4 9.4 4.2 9.4 6.4c0 .5-.15.95-.4 1.32.8-.2 1.3-.9 1.5-1.5C11.7 7.5 12 9 12 10.2 12 13 9.8 15 7 15S2 13 2 10.2c0-2.5 1.7-3.6 2.1-6C5.4 5 5.6 6 6.2 6.4 5.6 4 6.1 2.4 7 1.2Z" fill="oklch(0.84 0.13 85)"/></svg>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; align-items: baseline; gap: 6px;"><span class="cr-mono" style="font-size: 34px; font-weight: 500; line-height: 1; color: oklch(0.93 0.005 250);">14</span><span style="font-size: 13px; color: oklch(0.6 0.01 250);">days</span></div>
+                <span style="font-size: 11.5px; color: oklch(0.6 0.01 250);">streak · <span style="color: oklch(0.72 0.15 150);">trained today</span></span>
+              </div>
+            </div>
+            <span style="width: 1px; height: 40px; background: oklch(0.2 0.006 250);"></span>
+            <div style="display: flex; flex-direction: column; gap: 7px;">
+              <span class="cr-mono" style="font-size: 10px; letter-spacing: 0.1em; color: oklch(0.52 0.01 250);">LAST 7</span>
+              <div style="display: flex; gap: 5px;"><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.43 0.10 250);"></span><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.31 0.06 250);"></span><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.54 0.14 250);"></span><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.165 0.006 250); border: 1px solid oklch(0.24 0.006 250);"></span><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.43 0.10 250);"></span><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.54 0.14 250);"></span><span style="width: 13px; height: 13px; border-radius: 3px; background: oklch(0.84 0.13 85);"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- heatmap -->
+        <div style="background: oklch(0.128 0.004 250); border: 1px solid oklch(0.2 0.006 250); border-radius: 10px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between;">
+            <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.09em; color: oklch(0.55 0.01 250);">371 DAYS · 248 REPS</span>
+            <div style="display: flex; align-items: center; gap: 7px;"><span class="cr-mono" style="font-size: 11px; color: oklch(0.55 0.01 250);">less</span><span style="width: 11px; height: 11px; border-radius: 2px; background: oklch(0.165 0.006 250); border: 1px solid oklch(0.24 0.006 250);"></span><span style="width: 11px; height: 11px; border-radius: 2px; background: oklch(0.31 0.06 250);"></span><span style="width: 11px; height: 11px; border-radius: 2px; background: oklch(0.43 0.10 250);"></span><span style="width: 11px; height: 11px; border-radius: 2px; background: oklch(0.54 0.14 250);"></span><span style="width: 11px; height: 11px; border-radius: 2px; background: oklch(0.65 0.16 250);"></span><span class="cr-mono" style="font-size: 11px; color: oklch(0.55 0.01 250);">more</span></div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div style="display: grid; grid-template-rows: repeat(7, 12px); gap: 3px; padding-top: 1px;"><span class="cr-mono" style="font-size: 9px; color: oklch(0.45 0.01 250); grid-row: 2; line-height: 12px;">Mon</span><span class="cr-mono" style="font-size: 9px; color: oklch(0.45 0.01 250); grid-row: 4; line-height: 12px;">Wed</span><span class="cr-mono" style="font-size: 9px; color: oklch(0.45 0.01 250); grid-row: 6; line-height: 12px;">Fri</span></div>
+            <div style="display: grid; grid-template-rows: repeat(7, 12px); grid-auto-flow: column; grid-auto-columns: 12px; gap: 3px;">
+              <sc-for list="{{ heat }}" as="cell" hint-placeholder-count="90">
+                <div style="width: 12px; height: 12px; border-radius: 2px; background: {{ cell.color }};"></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; gap: 44px; padding-left: 46px;"><span class="cr-mono" style="font-size: 10px; color: oklch(0.45 0.01 250);">Aug</span><span class="cr-mono" style="font-size: 10px; color: oklch(0.45 0.01 250);">Oct</span><span class="cr-mono" style="font-size: 10px; color: oklch(0.45 0.01 250);">Dec</span><span class="cr-mono" style="font-size: 10px; color: oklch(0.45 0.01 250);">Feb</span><span class="cr-mono" style="font-size: 10px; color: oklch(0.45 0.01 250);">Apr</span><span class="cr-mono" style="font-size: 10px; color: oklch(0.45 0.01 250);">Jun</span></div>
+        </div>
+
+        <!-- readiness statements -->
+        <div style="display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0;">
+          <span class="cr-mono" style="font-size: 11px; letter-spacing: 0.09em; color: oklch(0.55 0.01 250);">READINESS BY CATEGORY</span>
+          <div style="display: flex; flex-direction: column; border: 1px solid oklch(0.18 0.006 250); border-radius: 10px; overflow: hidden;">
+
+            <div style="display: flex; align-items: center; gap: 20px; padding: 15px 22px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span>
+              <span style="width: 150px; font-size: 15px; font-weight: 500; color: oklch(0.93 0.005 250);">JavaScript</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; letter-spacing: 0.05em; color: oklch(0.72 0.15 150);">SHARP</span>
+              <span style="flex: 1; font-size: 13.5px; color: oklch(0.62 0.01 250);">21 passed · <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.78 0.02 250);">PR</span> on debounce · trained today</span>
+              <svg width="96" height="28" viewBox="0 0 96 28" fill="none" style="flex-shrink: 0;"><polyline points="0,22 16,19 32,16 48,14 64,10 80,8 96,6" stroke="oklch(0.65 0.16 250)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="cr-mono" style="width: 34px; font-size: 16px; text-align: right; color: oklch(0.9 0.005 250);">91</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 20px; padding: 15px 22px; border-top: 1px solid oklch(0.16 0.005 250);">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span>
+              <span style="width: 150px; font-size: 15px; font-weight: 500; color: oklch(0.93 0.005 250);">React</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; letter-spacing: 0.05em; color: oklch(0.72 0.15 150);">READY</span>
+              <span style="flex: 1; font-size: 13.5px; color: oklch(0.62 0.01 250);">12 passed · 3 at D4+ · trained 2d ago</span>
+              <svg width="96" height="28" viewBox="0 0 96 28" fill="none" style="flex-shrink: 0;"><polyline points="0,20 16,18 32,19 48,14 64,13 80,12 96,11" stroke="oklch(0.65 0.16 250)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="cr-mono" style="width: 34px; font-size: 16px; text-align: right; color: oklch(0.9 0.005 250);">84</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 20px; padding: 15px 22px; border-top: 1px solid oklch(0.16 0.005 250);">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span>
+              <span style="width: 150px; font-size: 15px; font-weight: 500; color: oklch(0.93 0.005 250);">CSS Layout</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; letter-spacing: 0.05em; color: oklch(0.72 0.15 150);">READY</span>
+              <span style="flex: 1; font-size: 13.5px; color: oklch(0.62 0.01 250);">8 passed · steady · trained 4d ago</span>
+              <svg width="96" height="28" viewBox="0 0 96 28" fill="none" style="flex-shrink: 0;"><polyline points="0,16 16,15 32,14 48,15 64,13 80,13 96,12" stroke="oklch(0.65 0.16 250)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="cr-mono" style="width: 34px; font-size: 16px; text-align: right; color: oklch(0.9 0.005 250);">78</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 20px; padding: 15px 22px; border-top: 1px solid oklch(0.16 0.005 250);">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.75 0.14 85); flex-shrink: 0;"></span>
+              <span style="width: 150px; font-size: 15px; font-weight: 500; color: oklch(0.93 0.005 250);">TypeScript</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; letter-spacing: 0.05em; color: oklch(0.82 0.13 85);">NEEDS WORK</span>
+              <span style="flex: 1; font-size: 13.5px; color: oklch(0.62 0.01 250);">decaying · <span style="color: oklch(0.82 0.13 85);">−14 in 9 days</span> · last trained 9d ago</span>
+              <svg width="96" height="28" viewBox="0 0 96 28" fill="none" style="flex-shrink: 0;"><polyline points="0,8 16,7 32,9 48,11 64,14 80,18 96,22" stroke="oklch(0.84 0.13 85)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="cr-mono" style="width: 34px; font-size: 16px; text-align: right; color: oklch(0.82 0.13 85);">61</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 20px; padding: 15px 22px; border-top: 1px solid oklch(0.16 0.005 250);">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.75 0.14 85); flex-shrink: 0;"></span>
+              <span style="width: 150px; font-size: 15px; font-weight: 500; color: oklch(0.93 0.005 250);">Algorithms</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; letter-spacing: 0.05em; color: oklch(0.82 0.13 85);">NEEDS WORK</span>
+              <span style="flex: 1; font-size: 13.5px; color: oklch(0.62 0.01 250);">2 timeouts this week · last trained 6d ago</span>
+              <svg width="96" height="28" viewBox="0 0 96 28" fill="none" style="flex-shrink: 0;"><polyline points="0,10 16,9 32,12 48,13 64,16 80,19 96,23" stroke="oklch(0.84 0.13 85)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="cr-mono" style="width: 34px; font-size: 16px; text-align: right; color: oklch(0.82 0.13 85);">58</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 20px; padding: 15px 22px; border-top: 1px solid oklch(0.16 0.005 250);">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.35 0.01 250); flex-shrink: 0;"></span>
+              <span style="width: 150px; font-size: 15px; font-weight: 500; color: oklch(0.7 0.01 250);">System Design</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; letter-spacing: 0.05em; color: oklch(0.5 0.01 250);">UNTRAINED</span>
+              <span style="flex: 1; font-size: 13.5px; color: oklch(0.55 0.01 250);">No reps yet — your first one sets the baseline.</span>
+              <span class="cr-mono" style="width: 96px; font-size: 11px; color: oklch(0.4 0.01 250); text-align: center;">— — — — —</span>
+              <span class="cr-mono" style="width: 34px; font-size: 16px; text-align: right; color: oklch(0.45 0.01 250);">·</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ WARMUP ============================ -->
+  <section id="warmup" data-screen-label="Warmup" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>WARMUP · ONE SESSION SHEET, NOT A CARD GRID
+    </div>
+
+    <div style="width: 1440px; height: 900px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 56px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 28px;">
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <div style="display: flex; align-items: center; gap: 9px;"><div style="width: 19px; height: 19px; border-radius: 4px; background: oklch(0.65 0.16 250); position: relative;"><div style="position: absolute; inset: 5px; border: 1.6px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div><span style="font-weight: 600; font-size: 15px; letter-spacing: -0.01em;">CodeReps</span></div>
+          <div style="display: flex; align-items: center; gap: 4px; height: 56px;">
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; font-weight: 500; color: oklch(0.93 0.005 250); border-bottom: 2px solid oklch(0.65 0.16 250);">Warmup</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Practice</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Log</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Library</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="15" viewBox="0 0 14 16" fill="none"><path d="M7 1.2C7.6 3.4 9.4 4.2 9.4 6.4c0 .5-.15.95-.4 1.32.8-.2 1.3-.9 1.5-1.5C11.7 7.5 12 9 12 10.2 12 13 9.8 15 7 15S2 13 2 10.2c0-2.5 1.7-3.6 2.1-6C5.4 5 5.6 6 6.2 6.4 5.6 4 6.1 2.4 7 1.2Z" fill="oklch(0.84 0.13 85)"/></svg><span class="cr-mono" style="font-size: 13px; color: oklch(0.84 0.13 85);">14</span></span>
+          <div style="width: 27px; height: 27px; border-radius: 50%; background: oklch(0.22 0.02 250); border: 1px solid oklch(0.3 0.02 250); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: oklch(0.8 0.02 250);">JK</div>
+        </div>
+      </div>
+
+      <div style="flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 52px 40px; overflow: auto;">
+        <div style="width: 780px; background: oklch(0.128 0.004 250); border: 1px solid oklch(0.2 0.006 250); border-radius: 12px; box-shadow: 0 24px 60px -30px oklch(0 0 0 / 0.7); overflow: hidden;">
+          <div style="height: 4px; background: oklch(0.65 0.16 250);"></div>
+          <div style="padding: 34px 40px 36px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <h1 style="margin: 0; font-size: 27px; font-weight: 600; letter-spacing: -0.015em;">Today&rsquo;s warmup</h1>
+                <span style="font-size: 14px; color: oklch(0.62 0.01 250);">Thursday, July 3</span>
+              </div>
+              <span class="cr-mono" style="font-size: 11.5px; letter-spacing: 0.06em; color: oklch(0.55 0.01 250); padding-top: 6px;">SESSION 214 · ~12 MIN</span>
+            </div>
+            <p style="margin: 0 0 28px; font-size: 15px; line-height: 1.55; color: oklch(0.72 0.005 250);">Three reps: one you know, one that&rsquo;s slipping, one you&rsquo;ve never done. Same shape every morning.</p>
+
+            <div style="display: flex; flex-direction: column; border-top: 1px solid oklch(0.2 0.006 250);">
+              <!-- rep 1 done -->
+              <div style="display: flex; align-items: center; gap: 20px; padding: 20px 4px; border-bottom: 1px solid oklch(0.18 0.006 250);">
+                <span class="cr-mono" style="font-size: 12px; color: oklch(0.5 0.01 250); width: 16px;">1</span>
+                <div style="width: 90px; flex-shrink: 0;"><span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.06em; color: oklch(0.6 0.01 250);">REVIEW</span></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font-size: 15.5px; font-weight: 500; color: oklch(0.7 0.01 250); text-decoration: line-through; text-decoration-color: oklch(0.4 0.01 250);">Debounce</span>
+                  <span style="font-size: 12.5px; color: oklch(0.55 0.01 250);">JavaScript · Timing · trained 2d ago, keep it sharp</span>
+                </div>
+                <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.55 0.01 250); width: 62px; text-align: right;">PAR 4:00</span>
+                <span style="display: inline-flex; align-items: center; gap: 6px; width: 84px; justify-content: flex-end; color: oklch(0.72 0.15 150);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="cr-mono" style="font-size: 12px;">DONE</span></span>
+              </div>
+              <!-- rep 2 current -->
+              <div style="display: flex; align-items: center; gap: 20px; padding: 20px 4px; border-bottom: 1px solid oklch(0.18 0.006 250); background: oklch(0.65 0.16 250 / 0.05); margin: 0 -8px; padding-left: 12px; padding-right: 12px; border-radius: 6px;">
+                <span class="cr-mono" style="font-size: 12px; color: oklch(0.7 0.01 250); width: 16px;">2</span>
+                <div style="width: 90px; flex-shrink: 0;"><span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.06em; color: oklch(0.82 0.13 85);">WEAK SPOT</span></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font-size: 15.5px; font-weight: 500; color: oklch(0.95 0.005 250);">Discriminated unions</span>
+                  <span style="font-size: 12.5px; color: oklch(0.62 0.01 250);">TypeScript · fluency 61 and decaying</span>
+                </div>
+                <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.6 0.01 250); width: 62px; text-align: right;">PAR 5:00</span>
+                <span style="display: inline-flex; align-items: center; gap: 6px; width: 84px; justify-content: flex-end; color: oklch(0.7 0.14 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span><span class="cr-mono" style="font-size: 12px;">NOW</span></span>
+              </div>
+              <!-- rep 3 pending -->
+              <div style="display: flex; align-items: center; gap: 20px; padding: 20px 4px;">
+                <span class="cr-mono" style="font-size: 12px; color: oklch(0.5 0.01 250); width: 16px;">3</span>
+                <div style="width: 90px; flex-shrink: 0;"><span class="cr-mono" style="font-size: 10.5px; letter-spacing: 0.06em; color: oklch(0.7 0.14 250);">NEW</span></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font-size: 15.5px; font-weight: 500; color: oklch(0.93 0.005 250);">useReducer from scratch</span>
+                  <span style="font-size: 12.5px; color: oklch(0.62 0.01 250);">React · never trained — sets your baseline</span>
+                </div>
+                <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.6 0.01 250); width: 62px; text-align: right;">PAR 6:00</span>
+                <span style="display: inline-flex; align-items: center; gap: 6px; width: 84px; justify-content: flex-end; color: oklch(0.5 0.01 250);"><span style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid oklch(0.4 0.01 250);"></span><span class="cr-mono" style="font-size: 12px;">TO DO</span></span>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 32px;">
+              <button style="display: flex; align-items: center; gap: 9px; font-family: inherit; font-weight: 500; font-size: 15px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 13px 24px; cursor: pointer;" style-hover="background: oklch(0.70 0.16 250);" style-focus="box-shadow: 0 0 0 2px oklch(0.128 0.004 250), 0 0 0 4px oklch(0.65 0.16 250); outline: none;"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4 3l9 5-9 5V3z" fill="currentColor"/></svg>Resume — Rep 2 of 3</button>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button style="font-family: inherit; font-weight: 500; font-size: 13.5px; color: oklch(0.7 0.01 250); background: transparent; border: none; border-radius: 6px; padding: 10px 14px; cursor: pointer;" style-hover="background: oklch(0.18 0.006 250);">Rebuild session</button>
+                <button style="font-family: inherit; font-weight: 500; font-size: 13.5px; color: oklch(0.58 0.01 250); background: transparent; border: none; border-radius: 6px; padding: 10px 14px; cursor: pointer;" style-hover="background: oklch(0.18 0.006 250);">Skip today</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ LIBRARY ============================ -->
+  <section id="library" data-screen-label="Library" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.65 0.16 250);"></span>LIBRARY · A LOGBOOK, NOT A CARD GRID
+    </div>
+
+    <div style="width: 1440px; height: 900px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 56px; flex-shrink: 0; border-bottom: 1px solid oklch(0.18 0.006 250); display: flex; align-items: center; justify-content: space-between; padding: 0 28px;">
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <div style="display: flex; align-items: center; gap: 9px;"><div style="width: 19px; height: 19px; border-radius: 4px; background: oklch(0.65 0.16 250); position: relative;"><div style="position: absolute; inset: 5px; border: 1.6px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div><span style="font-weight: 600; font-size: 15px; letter-spacing: -0.01em;">CodeReps</span></div>
+          <div style="display: flex; align-items: center; gap: 4px; height: 56px;">
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Warmup</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Practice</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; color: oklch(0.6 0.01 250);">Log</span>
+            <span style="display: flex; align-items: center; height: 100%; padding: 0 14px; font-size: 13.5px; font-weight: 500; color: oklch(0.93 0.005 250); border-bottom: 2px solid oklch(0.65 0.16 250);">Library</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="15" viewBox="0 0 14 16" fill="none"><path d="M7 1.2C7.6 3.4 9.4 4.2 9.4 6.4c0 .5-.15.95-.4 1.32.8-.2 1.3-.9 1.5-1.5C11.7 7.5 12 9 12 10.2 12 13 9.8 15 7 15S2 13 2 10.2c0-2.5 1.7-3.6 2.1-6C5.4 5 5.6 6 6.2 6.4 5.6 4 6.1 2.4 7 1.2Z" fill="oklch(0.84 0.13 85)"/></svg><span class="cr-mono" style="font-size: 13px; color: oklch(0.84 0.13 85);">14</span></span>
+          <div style="width: 27px; height: 27px; border-radius: 50%; background: oklch(0.22 0.02 250); border: 1px solid oklch(0.3 0.02 250); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: oklch(0.8 0.02 250);">JK</div>
+        </div>
+      </div>
+
+      <div style="flex: 1; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; min-height: 0;">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <h1 style="margin: 0; font-size: 27px; font-weight: 600; letter-spacing: -0.015em;">Library</h1>
+            <span style="font-size: 13.5px; color: oklch(0.62 0.01 250);"><span class="cr-mono" style="color: oklch(0.8 0.005 250);">128</span> challenges · <span class="cr-mono" style="color: oklch(0.8 0.005 250);">42</span> trained</span>
+          </div>
+          <div style="position: relative;">
+            <input type="text" placeholder="Search challenges" style="font-family: inherit; font-size: 13.5px; color: oklch(0.9 0.005 250); background: oklch(0.145 0.004 250); border: 1px solid oklch(0.26 0.008 250); border-radius: 6px; padding: 9px 12px 9px 34px; width: 260px;" style-focus="border-color: oklch(0.65 0.16 250); box-shadow: 0 0 0 2px oklch(0.65 0.16 250 / 0.28); outline: none;" />
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%);"><circle cx="7" cy="7" r="4.5" stroke="oklch(0.55 0.01 250)" stroke-width="1.4"/><path d="M10.5 10.5L14 14" stroke="oklch(0.55 0.01 250)" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: inline-flex; background: oklch(0.145 0.004 250); border: 1px solid oklch(0.24 0.006 250); border-radius: 6px; padding: 3px; gap: 2px;">
+            <span style="font-size: 13px; font-weight: 500; color: oklch(0.96 0.005 250); background: oklch(0.24 0.01 250); border-radius: 4px; padding: 6px 13px;">All</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">JavaScript</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">TypeScript</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">React</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">CSS</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">Algorithms</span>
+          </div>
+          <div style="display: inline-flex; background: oklch(0.145 0.004 250); border: 1px solid oklch(0.24 0.006 250); border-radius: 6px; padding: 3px; gap: 2px;">
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">All levels</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">D1–2</span>
+            <span style="font-size: 13px; color: oklch(0.65 0.01 250); padding: 6px 13px; cursor: pointer;">D3</span>
+            <span style="font-size: 13px; font-weight: 500; color: oklch(0.96 0.005 250); background: oklch(0.24 0.01 250); border-radius: 4px; padding: 6px 13px;">D4+</span>
+          </div>
+        </div>
+
+        <div style="flex: 1; display: flex; flex-direction: column; border: 1px solid oklch(0.18 0.006 250); border-radius: 10px; overflow: hidden; min-height: 0;">
+          <div style="display: flex; align-items: center; gap: 20px; padding: 11px 20px; background: oklch(0.128 0.004 250); border-bottom: 1px solid oklch(0.2 0.006 250);">
+            <span style="width: 8px; flex-shrink: 0;"></span>
+            <span class="cr-mono" style="flex: 1; font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.52 0.01 250);">CHALLENGE</span>
+            <span class="cr-mono" style="width: 130px; font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.52 0.01 250);">CATEGORY</span>
+            <span class="cr-mono" style="width: 92px; font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.52 0.01 250);">LEVEL</span>
+            <span class="cr-mono" style="width: 56px; font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.52 0.01 250); text-align: right;">BEST</span>
+            <span class="cr-mono" style="width: 92px; font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.52 0.01 250); text-align: right;">TRAINED</span>
+            <span class="cr-mono" style="width: 44px; font-size: 10.5px; letter-spacing: 0.08em; color: oklch(0.52 0.01 250); text-align: right;">REPS</span>
+          </div>
+          <div style="flex: 1; overflow: auto;">
+            <!-- rows -->
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Debounce</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">JavaScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">91</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.72 0.15 150); text-align: right;">today</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">8</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.75 0.14 85); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Discriminated unions</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">TypeScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.82 0.13 85); text-align: right;">61</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">9d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">3</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid oklch(0.38 0.01 250); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.78 0.005 250);">useReducer from scratch</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">React</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.45 0.01 250); text-align: right;">—</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.48 0.01 250); text-align: right;">never</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.5 0.01 250); text-align: right;">0</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Deep clone</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">JavaScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">84</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">3d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">5</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.75 0.14 85); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">LRU cache</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">Algorithms</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.82 0.13 85); text-align: right;">58</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">6d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">4</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Flatten nested array</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">JavaScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">88</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">5d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">6</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Custom useEffect</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">React</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">72</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">4d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">2</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Flexbox holy grail</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">CSS Layout</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">78</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">4d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">5</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Promise.all polyfill</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">JavaScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">80</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">8d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">4</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.75 0.14 85); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Generic type guard</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">TypeScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">66</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">9d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">3</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Binary search</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">Algorithms</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">90</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">7d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">9</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px; border-bottom: 1px solid oklch(0.15 0.005 250);" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; background: oklch(0.72 0.15 150); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.92 0.005 250);">Throttle</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">JavaScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.9 0.005 250); text-align: right;">86</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.6 0.01 250); text-align: right;">2d ago</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.6 0.01 250); text-align: right;">7</span></div>
+            <div style="display: flex; align-items: center; gap: 20px; padding: 13px 20px;" style-hover="background: oklch(0.145 0.004 250);"><span style="width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid oklch(0.38 0.01 250); flex-shrink: 0;"></span><span style="flex: 1; font-size: 14.5px; font-weight: 500; color: oklch(0.78 0.005 250);">Memoize</span><span style="width: 130px; font-size: 13px; color: oklch(0.62 0.01 250);">JavaScript</span><span style="width: 92px; display: inline-flex; gap: 3px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.85 0.02 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span></span><span class="cr-mono" style="width: 56px; font-size: 14px; color: oklch(0.45 0.01 250); text-align: right;">—</span><span class="cr-mono" style="width: 92px; font-size: 12.5px; color: oklch(0.48 0.01 250); text-align: right;">never</span><span class="cr-mono" style="width: 44px; font-size: 13px; color: oklch(0.5 0.01 250); text-align: right;">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ LANDING ============================ -->
+  <section id="landing" data-screen-label="Landing" style="display: flex; flex-direction: column; gap: 16px; width: 1440px;">
+    <div class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250); display: flex; align-items: center; gap: 12px;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.84 0.13 85);"></span>LANDING · BRAND REGISTER · THE ONE LOUD PAGE
+    </div>
+
+    <div style="width: 1440px; height: 1040px; background: oklch(0.10 0 0); border: 1px solid oklch(0.22 0.006 250); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+
+      <div style="height: 68px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 1px solid oklch(0.16 0.005 250);">
+        <div style="display: flex; align-items: center; gap: 10px;"><div style="width: 22px; height: 22px; border-radius: 5px; background: oklch(0.65 0.16 250); position: relative;"><div style="position: absolute; inset: 6px; border: 1.8px solid oklch(0.97 0.005 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div><span style="font-weight: 600; font-size: 17px; letter-spacing: -0.01em;">CodeReps</span></div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.75 0.01 250); background: transparent; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer;" style-hover="color: oklch(0.95 0.005 250); background: oklch(0.16 0.005 250);">Sign in</button>
+          <button style="font-family: inherit; font-weight: 500; font-size: 14px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; padding: 9px 18px; border-radius: 6px; cursor: pointer;" style-hover="background: oklch(0.70 0.16 250);">Start training</button>
+        </div>
+      </div>
+
+      <div style="flex: 1; overflow: auto;">
+
+        <!-- HERO -->
+        <div style="display: flex; align-items: center; gap: 64px; padding: 84px 72px 72px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 30px; max-width: 620px;">
+            <span class="cr-mono" style="font-size: 13px; letter-spacing: 0.04em; color: oklch(0.84 0.13 85);">FLUENCY TRAINING FOR ENGINEERS</span>
+            <h1 style="margin: 0; font-size: 60px; line-height: 1.04; font-weight: 600; letter-spacing: -0.03em;">AI writes your code.<br>Can you still write<br>it yourself?</h1>
+            <p style="margin: 0; font-size: 18px; line-height: 1.55; color: oklch(0.68 0.01 250); max-width: 520px;">Understanding survives. Execution atrophies. CodeReps is where you keep the muscle — short, timed reps from memory. No autocomplete, no AI, no paste. Scored against par, tracked as it decays.</p>
+            <div style="display: flex; align-items: center; gap: 14px; margin-top: 4px;">
+              <button style="display: flex; align-items: center; gap: 9px; font-family: inherit; font-weight: 500; font-size: 16px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; padding: 15px 26px; border-radius: 6px; cursor: pointer;" style-hover="background: oklch(0.70 0.16 250);"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M4 3l9 5-9 5V3z" fill="currentColor"/></svg>Start a rep</button>
+              <button style="font-family: inherit; font-weight: 500; font-size: 16px; color: oklch(0.85 0.005 250); background: oklch(0.16 0.005 250); border: 1px solid oklch(0.26 0.008 250); padding: 15px 24px; border-radius: 6px; cursor: pointer;" style-hover="background: oklch(0.2 0.006 250);">Watch a rep</button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 18px; margin-top: 6px;">
+              <span class="cr-mono" style="font-size: 12.5px; color: oklch(0.55 0.01 250);">no autocomplete</span><span style="width: 3px; height: 3px; border-radius: 50%; background: oklch(0.4 0.01 250);"></span><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.55 0.01 250);">no AI</span><span style="width: 3px; height: 3px; border-radius: 50%; background: oklch(0.4 0.01 250);"></span><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.55 0.01 250);">no paste</span>
+            </div>
+          </div>
+
+          <!-- hero artifact: the practice screen -->
+          <div style="flex-shrink: 0; width: 600px; background: oklch(0.115 0.003 250); border: 1px solid oklch(0.24 0.006 250); border-radius: 12px; overflow: hidden; box-shadow: 0 40px 90px -40px oklch(0 0 0 / 0.8);">
+            <div style="height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 1px solid oklch(0.18 0.006 250); background: oklch(0.13 0.004 250);">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: oklch(0.3 0.01 250);"></span>
+              <span class="cr-mono" style="font-size: 12px; color: oklch(0.62 0.01 250); margin-left: 8px;">debounce.js</span>
+              <span style="flex: 1;"></span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; border: 1px solid oklch(0.24 0.006 250); border-radius: 5px; padding: 2px 7px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: oklch(0.6 0.01 250);"></span><span class="cr-mono" style="font-size: 10px; color: oklch(0.6 0.01 250);">AI OFF</span></span>
+            </div>
+            <div style="display: flex; height: 362px;">
+              <div style="flex: 1; display: flex; min-width: 0;">
+                <div aria-hidden="true" style="width: 40px; padding: 14px 8px 0 0; text-align: right; background: oklch(0.128 0.004 250); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 21px; color: oklch(0.4 0.01 250);"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div style="color: oklch(0.75 0.02 250);">8</div><div>9</div><div>10</div><div>11</div></div>
+                <div style="flex: 1; padding: 14px 0 0 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 21px; white-space: pre; color: oklch(0.88 0.005 250);"><div style="color: oklch(0.5 0.01 250);">// from memory</div><div><span style="color: oklch(0.72 0.11 265);">function</span> <span style="color: oklch(0.8 0.09 230);">debounce</span>(fn, wait) {</div><div>  <span style="color: oklch(0.72 0.11 265);">let</span> t = <span style="color: oklch(0.8 0.08 85);">null</span>;</div><div>  <span style="color: oklch(0.72 0.11 265);">return</span> (...args) =&gt; {</div><div>    <span style="color: oklch(0.8 0.09 230);">clearTimeout</span>(t);</div><div>    t = <span style="color: oklch(0.8 0.09 230);">setTimeout</span>(() =&gt; {</div><div>      fn(...args);</div><div style="background: oklch(0.165 0.006 250); margin: 0 0 0 -16px; padding: 0 0 0 16px;">    }, wait);<span class="cr-cursor"></span></div><div>  };</div><div>}</div></div>
+              </div>
+              <div style="width: 176px; flex-shrink: 0; background: oklch(0.145 0.004 250); border-left: 1px solid oklch(0.18 0.006 250); display: flex; flex-direction: column; padding: 16px 16px;">
+                <span class="cr-mono" style="font-size: 10px; letter-spacing: 0.1em; color: oklch(0.55 0.01 250);">ELAPSED</span>
+                <span class="cr-mono" data-cr-timer style="font-size: 34px; font-weight: 500; line-height: 1.2; color: oklch(0.93 0.005 250);">3:07</span>
+                <span class="cr-mono" style="font-size: 11.5px; color: oklch(0.6 0.01 250); margin-top: 2px;">PAR 4:00</span>
+                <div style="height: 4px; border-radius: 2px; background: oklch(0.2 0.006 250); margin-top: 8px; overflow: hidden;"><div data-cr-bar style="height: 100%; width: 78%; background: oklch(0.65 0.16 250); border-radius: 2px;"></div></div>
+                <div style="flex: 1;"></div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;"><span class="cr-mono" style="font-size: 10px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">FAULTS</span><span class="cr-mono" style="font-size: 13px; color: oklch(0.65 0.01 250);">00</span></div>
+                <button style="font-family: inherit; font-weight: 500; font-size: 13px; color: oklch(0.98 0.005 250); background: oklch(0.65 0.16 250); border: none; border-radius: 6px; padding: 9px; cursor: pointer;">Submit rep</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- thesis band -->
+        <div style="padding: 20px 72px 64px; display: flex; flex-direction: column; gap: 40px;">
+          <div style="border-top: 1px solid oklch(0.18 0.006 250); padding-top: 48px;">
+            <p style="margin: 0; font-size: 38px; line-height: 1.22; font-weight: 500; letter-spacing: -0.015em; max-width: 1000px;"><span style="color: oklch(0.55 0.01 250);">LeetCode tests whether you can</span> solve it. <span style="color: oklch(0.55 0.01 250);">CodeReps tests whether you can still</span> <span style="color: oklch(0.7 0.14 250);">execute</span> <span style="color: oklch(0.55 0.01 250);">what you already understand.</span></p>
+          </div>
+          <div style="display: flex; gap: 48px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid oklch(0.2 0.006 250);">
+              <span class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">THE REP</span>
+              <p style="margin: 0; font-size: 15.5px; line-height: 1.55; color: oklch(0.72 0.005 250);">Implement a debounce, a generic type, a component from a description — from memory, in a real editor. 15 to 45 minutes, then close it.</p>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid oklch(0.2 0.006 250);">
+              <span class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.55 0.01 250);">THE CLOCK</span>
+              <p style="margin: 0; font-size: 15.5px; line-height: 1.55; color: oklch(0.72 0.005 250);">Every rep runs against a par time and a hidden test suite. You get a split, a verdict, and the standard solution side by side.</p>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid oklch(0.2 0.006 250);">
+              <span class="cr-mono" style="font-size: 12px; letter-spacing: 0.08em; color: oklch(0.84 0.13 85);">THE DECAY</span>
+              <p style="margin: 0; font-size: 15.5px; line-height: 1.55; color: oklch(0.72 0.005 250);">Fluency is a number that falls when you stop. Streaks, a year of reps, and honest per-category readiness keep you accountable.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 28px 72px; border-top: 1px solid oklch(0.16 0.005 250); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;"><div style="width: 16px; height: 16px; border-radius: 4px; background: oklch(0.3 0.02 250); position: relative;"><div style="position: absolute; inset: 4px; border: 1.4px solid oklch(0.7 0.01 250); border-radius: 50%; border-right-color: transparent; transform: rotate(-45deg);"></div></div><span class="cr-mono" style="font-size: 12.5px; color: oklch(0.55 0.01 250);">CodeReps · train your fluency</span></div>
+          <div style="display: flex; gap: 24px;"><span style="font-size: 13px; color: oklch(0.58 0.01 250);">Method</span><span style="font-size: 13px; color: oklch(0.58 0.01 250);">Pricing</span><span style="font-size: 13px; color: oklch(0.58 0.01 250);">Changelog</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!--SCREENS-->
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  elapsed = 187; keystrokes = 342; faults = 0; par = 240;
+
+  componentDidMount() {
+    this.paint();
+    this._t = setInterval(() => { this.elapsed += 1; this.paintTimer(); }, 1000);
+  }
+  componentWillUnmount() { if (this._t) clearInterval(this._t); }
+
+  paintTimer = () => {
+    const over = this.elapsed > this.par;
+    const tcol = over ? 'oklch(0.75 0.14 85)' : 'oklch(0.93 0.005 250)';
+    const bcol = over ? 'oklch(0.75 0.14 85)' : 'oklch(0.65 0.16 250)';
+    const w = Math.min(100, (this.elapsed / this.par) * 100) + '%';
+    document.querySelectorAll('[data-cr-timer]').forEach(el => { el.textContent = this.fmt(this.elapsed); el.style.color = tcol; });
+    document.querySelectorAll('[data-cr-bar]').forEach(el => { el.style.width = w; el.style.background = bcol; });
+  };
+  paintFaults = () => {
+    const col = this.faults > 0 ? 'oklch(0.84 0.13 85)' : 'oklch(0.65 0.01 250)';
+    document.querySelectorAll('[data-cr-fault]').forEach(el => { el.textContent = String(this.faults).padStart(2, '0'); el.style.color = col; });
+  };
+  paint = () => {
+    this.paintTimer();
+    document.querySelectorAll('[data-cr-ks]').forEach(el => { el.textContent = String(this.keystrokes); });
+    this.paintFaults();
+  };
+
+  onKey = (e) => {
+    if (['Shift', 'Meta', 'Control', 'Alt', 'CapsLock'].includes(e.key)) return;
+    this.keystrokes += 1;
+    document.querySelectorAll('[data-cr-ks]').forEach(el => { el.textContent = String(this.keystrokes); });
+  };
+  onPaste = (e) => { e.preventDefault(); this.faults += 1; this.paintFaults(); };
+  onFocus = (e) => { const sec = e.target.closest('section'); if (sec) sec.querySelectorAll('[data-cr-chrome]').forEach(el => { el.style.opacity = '0.5'; }); };
+  onBlur = (e) => { const sec = e.target.closest('section'); if (sec) sec.querySelectorAll('[data-cr-chrome]').forEach(el => { el.style.opacity = '1'; }); };
+  bindEditor = (el) => {
+    if (!el || el._crBound) return;
+    el._crBound = true;
+    el.addEventListener('keydown', this.onKey);
+    el.addEventListener('paste', this.onPaste);
+    el.addEventListener('focus', this.onFocus);
+    el.addEventListener('blur', this.onBlur);
+  };
+
+  fmt(sec) { const m = Math.floor(sec / 60), s = sec % 60; return m + ':' + String(s).padStart(2, '0'); }
+
+  getHeat() {
+    if (this._heat) return this._heat;
+    const colors = ['oklch(0.165 0.006 250)', 'oklch(0.31 0.06 250)', 'oklch(0.43 0.10 250)', 'oklch(0.54 0.14 250)', 'oklch(0.65 0.16 250)'];
+    let seed = 1337;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    const N = 371, cells = [];
+    for (let i = 0; i < N; i++) {
+      const recency = i / N;
+      let level;
+      const r = rnd();
+      if (r < 0.34 - recency * 0.2) level = 0;
+      else { level = 1 + Math.floor(rnd() * (1 + recency * 3.4)); }
+      if (i > N - 15) level = Math.max(level, 2 + Math.floor(rnd() * 3));
+      if (level > 4) level = 4;
+      if (level < 0) level = 0;
+      cells.push({ color: colors[level] });
+    }
+    this._heat = cells;
+    return cells;
+  }
+
+  renderVals() {
+    return { bindEditor: this.bindEditor, heat: this.getHeat() };
+  }
+}
+</script>
+</body>
+</html>

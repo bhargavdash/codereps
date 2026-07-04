@@ -1,28 +1,201 @@
 @import "tailwindcss";
 
 /*
- * CodeReps design tokens — PLACEHOLDERS from the design brief
- * (~/DevBrain/wiki/projects/codereps-design-brief.md).
- * Replaced by the real system after the Claude Design session (board task S0-3).
+ * CodeReps design system — transcribed from the Claude Design session
+ * (CodeReps.dc.html, board task S0-3). Source brief:
+ * ~/DevBrain/wiki/projects/codereps-design-brief.md
+ *
+ * Voice: athletic timing instrument. Dark-only. OKLCH throughout, no hex.
+ * Cobalt is the only signal color; chalk-amber is rarer still.
  */
 @theme {
-  --color-bg: oklch(0.1 0 0);
-  --color-surface: oklch(0.145 0.004 250);
-  --color-raised: oklch(0.18 0.006 250);
-  --color-ink: oklch(0.93 0.005 250);
-  --color-muted: oklch(0.65 0.01 250);
-  --color-primary: oklch(0.65 0.16 250);
-  --color-accent: oklch(0.84 0.13 85);
+  /* ---- Surfaces (iron black up) ---- */
+  --color-bg: oklch(0.1 0 0); /* iron black — pure neutral */
+  --color-surface: oklch(0.145 0.004 250); /* panels, session rail */
+  --color-surface-2: oklch(0.128 0.004 250); /* prompt panel, cards */
+  --color-editor: oklch(0.112 0.003 250); /* editor field */
+  --color-well: oklch(0.115 0.004 250); /* tinted footers, striped rows */
+  --color-raised: oklch(0.18 0.006 250); /* hover fills, gutter, chips */
+  --color-line: oklch(0.165 0.006 250); /* active editor line */
+
+  /* ---- Ink ---- */
+  --color-ink: oklch(0.93 0.005 250); /* body text */
+  --color-ink-soft: oklch(0.86 0.005 250); /* prompt copy */
+  --color-muted: oklch(0.65 0.01 250); /* secondary — never body copy */
+  --color-muted-2: oklch(0.55 0.01 250); /* captions, meta labels */
+  --color-faint: oklch(0.45 0.01 250); /* tertiary, empty */
+
+  /* ---- Signal ---- */
+  --color-primary: oklch(0.65 0.16 250); /* cobalt */
+  --color-primary-hi: oklch(0.7 0.16 250); /* hover */
+  --color-primary-lo: oklch(0.59 0.15 250); /* active */
+  --color-primary-mid: oklch(0.7 0.14 250); /* NEW rep / emphasis cobalt */
+  --color-on-primary: oklch(0.98 0.005 250); /* text on cobalt fill */
+  --color-accent: oklch(0.84 0.13 85); /* chalk amber — streak, PR, at-risk */
+
+  /* ---- Ink extremes + dot/avatar treatments (documented micro-shades) ---- */
+  --color-ink-hi: oklch(0.95 0.005 250); /* brightest — active title */
+  --color-ink-dim: oklch(0.78 0.005 250); /* dimmed title — untrained */
+  --color-ink-mute: oklch(0.72 0.02 250); /* icon strokes, active gutter */
+  --color-dot-on: oklch(0.88 0.02 250); /* filled rep dot */
+  --color-dot-off: oklch(0.3 0.01 250); /* empty rep dot */
+  --color-avatar-bg: oklch(0.22 0.02 250);
+  --color-avatar-border: oklch(0.3 0.02 250);
+  --color-avatar-ink: oklch(0.8 0.02 250);
+
+  /* ---- Verdict ---- */
   --color-pass: oklch(0.72 0.15 150);
   --color-fail: oklch(0.62 0.19 25);
   --color-timeout: oklch(0.75 0.14 85);
 
+  /* ---- Borders ---- */
+  --color-border: oklch(0.18 0.006 250); /* hairline */
+  --color-border-2: oklch(0.24 0.006 250); /* stronger, chips */
+  --color-hair: oklch(0.16 0.005 250); /* faint inner divider */
+
+  /* ---- Heatmap ramp — 5 cobalt steps, surface → primary (NOT green) ---- */
+  --color-heat-0: oklch(0.165 0.006 250);
+  --color-heat-1: oklch(0.31 0.06 250);
+  --color-heat-2: oklch(0.43 0.1 250);
+  --color-heat-3: oklch(0.54 0.14 250);
+  --color-heat-4: oklch(0.65 0.16 250);
+
+  /* ---- Syntax (dark) ---- */
+  --color-syn-key: oklch(0.72 0.11 265);
+  --color-syn-fn: oklch(0.8 0.09 230);
+  --color-syn-lit: oklch(0.8 0.08 85);
+  --color-syn-punc: oklch(0.6 0.01 250);
+  --color-syn-com: oklch(0.5 0.01 250);
+
+  /* ---- Type ---- */
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  /* Fixed rem scale, ratio ~1.2 — no fluid clamp (product register) */
+  --text-display: 2.5rem; /* 40 — the timer, verdict */
+  --text-display-sm: 2.0625rem; /* 33 */
+  --text-heading: 1.4375rem; /* 23 */
+  --text-subhead: 1.1875rem; /* 19 */
+  --text-body: 1rem; /* 16 */
+  --text-small: 0.8125rem; /* 13 */
+
+  /* ---- Motion ---- */
+  --ease-out-quart: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ---- Z-scale (semantic) ---- */
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-modal: 400;
+  --z-toast: 600;
+  --z-tooltip: 800;
 }
 
-body {
-  background-color: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-variant-ligatures: none;
+    line-height: 1.5;
+  }
+  ::selection {
+    background: oklch(0.65 0.16 250 / 0.32);
+    color: oklch(0.97 0.005 250);
+  }
+  /* keyboard-first product: cobalt focus ring, offset by the surface behind it */
+  :focus-visible {
+    outline: none;
+  }
+}
+
+@layer components {
+  /* Instrument readout: every numeral is mono + tabular, like timing hardware */
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "ss01" 1;
+  }
+}
+
+/* ---- Keyframes (state-only motion) ---- */
+@keyframes cr-split-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cr-pr-settle {
+  0% {
+    opacity: 0;
+    transform: scale(1.12) rotate(-4deg);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-4deg);
+  }
+}
+@keyframes cr-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  49%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes cr-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.42;
+  }
+}
+
+/* Default visible; the keyframe supplies the entrance. If animation never runs
+   (reduced motion, headless render), the split still ships visible. */
+.cr-split {
+  animation: cr-split-in 240ms var(--ease-out-quart) both;
+}
+
+/* Diff line tints (read-only debrief panes) */
+.cm-line.cr-diff-your {
+  background: oklch(0.84 0.13 85 / 0.1);
+}
+.cm-line.cr-diff-ref {
+  background: oklch(0.72 0.15 150 / 0.1);
+}
+.cr-pr {
+  animation: cr-pr-settle 340ms var(--ease-out-quart);
+}
+.cr-skel {
+  animation: cr-pulse 1.4s ease-in-out infinite;
+}
+.cr-blink {
+  animation: cr-blink 1.06s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-split {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .cr-pr,
+  .cr-skel,
+  .cr-blink {
+    animation: none !important;
+  }
 }

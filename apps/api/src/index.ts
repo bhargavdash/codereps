@@ -1,18 +1,19 @@
 import "dotenv/config";
-import express from "express";
-import cors from "cors";
+import { prisma } from "@codereps/db";
+import { createApp } from "./app.js";
+import { env } from "./env.js";
 
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", service: "codereps-api" });
-});
-
-const port = Number(process.env.PORT) || 4000;
-
-app.listen(port, () => {
+const { port } = env();
+const server = createApp().listen(port, () => {
   console.log(`codereps-api listening on :${port}`);
 });
+
+async function shutdown(signal: string): Promise<void> {
+  console.log(`${signal} received — shutting down`);
+  server.close(() => void 0);
+  await prisma.$disconnect();
+  process.exit(0);
+}
+
+process.on("SIGINT", () => void shutdown("SIGINT"));
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
