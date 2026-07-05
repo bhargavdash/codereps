@@ -161,37 +161,5 @@ export const READINESS: ReadinessRow[] = [
   },
 ];
 
-export const LIBRARY_TOTALS = { challenges: 128, trained: 42 };
-
-const LIBRARY_PROGRESS: { slug: string; best: number | null; daysAgo: number | null; reps: number }[] =
-  [
-    { slug: "debounce", best: 91, daysAgo: 0, reps: 8 },
-    { slug: "discriminated-unions", best: 61, daysAgo: 9, reps: 3 },
-    { slug: "usereducer-from-scratch", best: null, daysAgo: null, reps: 0 },
-    { slug: "deep-clone", best: 84, daysAgo: 3, reps: 5 },
-    { slug: "lru-cache", best: 58, daysAgo: 6, reps: 4 },
-    { slug: "flatten-nested-array", best: 88, daysAgo: 5, reps: 6 },
-    { slug: "custom-useeffect", best: 72, daysAgo: 4, reps: 2 },
-    { slug: "flexbox-holy-grail", best: 78, daysAgo: 4, reps: 5 },
-    { slug: "promise-all-polyfill", best: 80, daysAgo: 8, reps: 4 },
-    { slug: "generic-type-guard", best: 66, daysAgo: 9, reps: 3 },
-    { slug: "binary-search", best: 90, daysAgo: 7, reps: 9 },
-    { slug: "throttle", best: 86, daysAgo: 2, reps: 7 },
-    { slug: "memoize", best: null, daysAgo: null, reps: 0 },
-  ];
-
-export const LIBRARY_ROWS: LibraryRow[] = LIBRARY_PROGRESS.flatMap((p) => {
-  const c = getChallenge(p.slug);
-  if (!c) return [];
-  return [
-    {
-      slug: c.slug,
-      title: c.title,
-      category: c.category,
-      difficulty: c.difficulty,
-      best: p.best,
-      daysAgo: p.daysAgo,
-      reps: p.reps,
-    },
-  ];
-});
+// Library mock data removed 2026-07-05 (S1-6): LibraryScreen now reads the
+// real challenges API via useLibraryRows.

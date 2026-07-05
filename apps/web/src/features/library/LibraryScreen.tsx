@@ -1,13 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppShell, Container } from "../../components/layout/AppShell";
+import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { RepDots } from "../../components/ui/RepDots";
 import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { Skeleton } from "../../components/ui/Skeleton";
 import { Search } from "../../components/icons";
-import { LIBRARY_ROWS, LIBRARY_TOTALS } from "../../data/app-data";
 import { CATEGORY_LABEL } from "../../data/types";
 import { fmtRecency } from "../../lib/format";
+import { useLibraryRows } from "./useLibraryRows";
 
 const categoryFilters = [
   { value: "all", label: "All" },
@@ -39,14 +41,51 @@ function HeadCell({ children, className }: { children?: React.ReactNode; classNa
   );
 }
 
+/** Column-shaped skeleton rows so the table doesn't jump when data lands. */
+function SkeletonRows() {
+  return (
+    <div aria-hidden="true">
+      {[86, 62, 74, 58, 70, 66].map((titleWidth, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-5 px-5 py-[15px] [&:not(:last-child)]:border-b [&:not(:last-child)]:border-hair"
+        >
+          <span className="w-2 shrink-0" />
+          <span className="flex-1">
+            <Skeleton width={`${titleWidth * 2.4}px`} />
+          </span>
+          <span className="w-[130px]">
+            <Skeleton width={72} />
+          </span>
+          <span className="w-[92px]">
+            <Skeleton width={52} height={7} />
+          </span>
+          <span className="flex w-14 justify-end">
+            <Skeleton width={20} />
+          </span>
+          <span className="flex w-[92px] justify-end">
+            <Skeleton width={40} />
+          </span>
+          <span className="flex w-11 justify-end">
+            <Skeleton width={16} />
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function LibraryScreen() {
+  const { state, retry } = useLibraryRows();
   const [category, setCategory] = useState("all");
   const [level, setLevel] = useState("all");
   const [query, setQuery] = useState("");
 
+  const allRows = state.status === "ready" ? state.rows : [];
+
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return LIBRARY_ROWS.filter((r) => {
+    return allRows.filter((r) => {
       if (category !== "all" && r.category !== category) return false;
       if (level === "d12" && r.difficulty > 2) return false;
       if (level === "d3" && r.difficulty !== 3) return false;
@@ -54,7 +93,9 @@ export function LibraryScreen() {
       if (q && !r.title.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [category, level, query]);
+  }, [allRows, category, level, query]);
+
+  const trained = allRows.filter((r) => r.reps > 0).length;
 
   return (
     <AppShell>
@@ -62,9 +103,15 @@ export function LibraryScreen() {
         <div className="flex items-end justify-between">
           <div className="flex flex-col gap-1.5">
             <h1 className="text-[27px] font-semibold tracking-[-0.015em]">Library</h1>
-            <span className="text-[13.5px] text-muted">
-              <span className="mono text-[oklch(0.8_0.005_250)]">{LIBRARY_TOTALS.challenges}</span> challenges ·{" "}
-              <span className="mono text-[oklch(0.8_0.005_250)]">{LIBRARY_TOTALS.trained}</span> trained
+            <span className="text-[13.5px] text-muted" aria-live="polite">
+              {state.status === "ready" ? (
+                <>
+                  <span className="mono text-[oklch(0.8_0.005_250)]">{allRows.length}</span> challenges ·{" "}
+                  <span className="mono text-[oklch(0.8_0.005_250)]">{trained}</span> trained
+                </>
+              ) : (
+                <span className="text-muted-2">loading the logbook…</span>
+              )}
             </span>
           </div>
           <div className="w-[260px]">
@@ -104,7 +151,26 @@ export function LibraryScreen() {
             <HeadCell className="w-11 text-right">REPS</HeadCell>
           </div>
 
-          {rows.length === 0 ? (
+          {state.status === "loading" ? (
+            <SkeletonRows />
+          ) : state.status === "error" ? (
+            <div className="flex flex-col items-center gap-3 px-5 py-16 text-center" role="alert">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[15px] font-medium text-ink">Couldn't load the library</span>
+                <span className="text-[13px] text-muted">{state.message}</span>
+              </div>
+              <Button variant="secondary" size="sm" offset="bg" onClick={retry}>
+                Try again
+              </Button>
+            </div>
+          ) : allRows.length === 0 ? (
+            <div className="flex flex-col items-center gap-1.5 px-5 py-16 text-center">
+              <span className="text-[15px] font-medium text-ink">The logbook is empty</span>
+              <span className="text-[13px] text-muted">
+                Challenges appear here as they're published. Check back soon.
+              </span>
+            </div>
+          ) : rows.length === 0 ? (
             <div className="flex flex-col items-center gap-1.5 px-5 py-16 text-center">
               <span className="text-[15px] font-medium text-ink">Nothing matches those filters</span>
               <span className="text-[13px] text-muted">Clear a filter, or search a different name.</span>
