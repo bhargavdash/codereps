@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./runner-core": {
+      "types": "./dist/runner-core/index.d.ts",
+      "import": "./dist/runner-core/index.js"
     }
   },
   "scripts": {

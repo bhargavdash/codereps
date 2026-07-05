@@ -7,7 +7,17 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@codereps/shared':
+        specifier: workspace:*
+        version: link:packages/shared
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
+      tsx:
+        specifier: ^4.22.4
+        version: 4.22.4
       turbo:
         specifier: ^2.5.4
         version: 2.10.2

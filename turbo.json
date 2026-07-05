@@ -11,6 +11,10 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "//#lint": {
+      "dependsOn": ["@codereps/shared#build"],
+      "inputs": ["content/**", "scripts/verify-content.ts"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
