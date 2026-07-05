@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@codereps/db':
+        specifier: workspace:*
+        version: link:packages/db
       '@codereps/shared':
         specifier: workspace:*
         version: link:packages/shared
+      dotenv:
+        specifier: ^16.6.1
+        version: 16.6.1
       zod:
         specifier: ^4.4.3
         version: 4.4.3
