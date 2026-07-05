@@ -1,6 +1,9 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./lib/auth-context";
+import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { LandingScreen } from "./features/landing/LandingScreen";
+import { LoginScreen } from "./features/auth/LoginScreen";
 import { WarmupScreen } from "./features/warmup/WarmupScreen";
 import { LogScreen } from "./features/log/LogScreen";
 import { LibraryScreen } from "./features/library/LibraryScreen";
@@ -24,18 +27,44 @@ function ScreenFallback() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<ScreenFallback />}>
-        <Routes>
-          <Route path="/" element={<LandingScreen />} />
-          <Route path="/warmup" element={<WarmupScreen />} />
-          <Route path="/practice/:slug" element={<PracticeScreen />} />
-          <Route path="/practice/:slug/debrief" element={<DebriefScreen />} />
-          <Route path="/log" element={<LogScreen />} />
-          <Route path="/library" element={<LibraryScreen />} />
-          <Route path="/design-system" element={<DesignSystemScreen />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
+      <AuthProvider>
+        <Suspense fallback={<ScreenFallback />}>
+          <Routes>
+            <Route path="/" element={<LandingScreen />} />
+            <Route path="/login" element={<LoginScreen />} />
+            <Route
+              path="/warmup"
+              element={
+                <ProtectedRoute>
+                  <WarmupScreen />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/log"
+              element={
+                <ProtectedRoute>
+                  <LogScreen />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/library"
+              element={
+                <ProtectedRoute>
+                  <LibraryScreen />
+                </ProtectedRoute>
+              }
+            />
+            {/* Practice + debrief stay open (no submission persistence until Sprint 3,
+                which is also when these routes start requiring a session). */}
+            <Route path="/practice/:slug" element={<PracticeScreen />} />
+            <Route path="/practice/:slug/debrief" element={<DebriefScreen />} />
+            <Route path="/design-system" element={<DesignSystemScreen />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

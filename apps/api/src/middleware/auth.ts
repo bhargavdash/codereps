@@ -16,8 +16,10 @@ declare global {
   }
 }
 
+// Supabase JWKS endpoint — same verification shape as nomad-api's authMiddleware:
+// createRemoteJWKSet + jwtVerify with explicit issuer/audience checks, no
+// service-role/secret key needed for token verification at all.
 let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
-const encoder = new TextEncoder();
 
 export async function requireAuth(
   req: Request,
@@ -45,14 +47,16 @@ export async function requireAuth(
 
   try {
     const token = header.slice("Bearer ".length);
-    const { payload } = config.supabaseJwtSecret
-      ? await jwtVerify(token, encoder.encode(config.supabaseJwtSecret))
-      : await jwtVerify(
-          token,
-          (jwks ??= createRemoteJWKSet(
-            new URL(`${config.supabaseUrl}/auth/v1/.well-known/jwks.json`),
-          )),
-        );
+    const { payload } = await jwtVerify(
+      token,
+      (jwks ??= createRemoteJWKSet(
+        new URL(`${config.supabaseUrl}/auth/v1/.well-known/jwks.json`),
+      )),
+      {
+        issuer: `${config.supabaseUrl}/auth/v1`,
+        audience: "authenticated",
+      },
+    );
     if (typeof payload.sub !== "string" || payload.sub.length === 0) {
       throw new Error("token has no sub");
     }

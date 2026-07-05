@@ -2,8 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "../../lib/cn";
 import { Logo } from "../ui/Logo";
 import { StreakBadge } from "../ui/StreakBadge";
-import { Avatar } from "../ui/Avatar";
-import { STREAK, USER, WARMUP } from "../../data/app-data";
+import { AccountMenu } from "./AccountMenu";
+import { STREAK, WARMUP } from "../../data/app-data";
 
 const tabs = [
   { label: "Warmup", to: "/warmup", match: "/warmup" },
@@ -47,7 +47,7 @@ export function TopNav() {
       </div>
       <div className="flex items-center gap-4">
         <StreakBadge days={STREAK.days} alive={STREAK.alive} />
-        <Avatar initials={USER.initials} size={27} />
+        <AccountMenu />
       </div>
     </header>
   );

@@ -1,15 +1,17 @@
 // CodeReps data model — architecture §4:
 // ~/DevBrain/wiki/projects/codereps-architecture.md
-// Server is always-on (Railway) → direct :5432 connection, default pool.
+//
+// Connection + RLS/trigger conventions replicated exactly from nomad-api
+// (Session pooler, single DATABASE_URL, dbgenerated UUIDs, RLS-as-defense-in-depth).
+// Hand-run SQL migrations: packages/db/supabase/migrations/.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Category {
@@ -42,14 +44,15 @@ enum SubStatus {
   abandoned
 }
 
-/// 1:1 with Supabase auth.users — id is the auth user id.
+/// 1:1 with Supabase auth.users — id is always supplied explicitly (the auth user
+/// id); the dbgenerated default is a safety net only, matching nomad-api's Profile.
 model Profile {
-  id          String   @id @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   username    String   @unique
   displayName String?  @map("display_name")
   timezone    String   @default("Asia/Kolkata") // streak day boundary
   settings    Json     @default("{}") // { strictPaste: true, ... }
-  createdAt   DateTime @default(now()) @map("created_at")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   attempts    Attempt[]
   submissions Submission[]
@@ -61,7 +64,7 @@ model Profile {
 }
 
 model Challenge {
-  id               String   @id @default(uuid()) @db.Uuid
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slug             String   @unique
   title            String
   category         Category
@@ -79,8 +82,8 @@ model Challenge {
   tags             String[] // GIN index added in raw SQL migration (S0-5)
   version          Int      @default(1)
   isPublished      Boolean  @default(false) @map("is_published")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   attempts    Attempt[]
   submissions Submission[]
@@ -92,10 +95,10 @@ model Challenge {
 
 /// Exists so the SERVER owns started_at — the client clock is never trusted.
 model Attempt {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId      String   @map("user_id") @db.Uuid
   challengeId String   @map("challenge_id") @db.Uuid
-  startedAt   DateTime @default(now()) @map("started_at")
+  startedAt   DateTime @default(now()) @map("started_at") @db.Timestamptz
 
   user       Profile     @relation(fields: [userId], references: [id])
   challenge  Challenge   @relation(fields: [challengeId], references: [id])
@@ -106,7 +109,7 @@ model Attempt {
 }
 
 model Submission {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   attemptId     String    @unique @map("attempt_id") @db.Uuid
   userId        String    @map("user_id") @db.Uuid
   challengeId   String    @map("challenge_id") @db.Uuid
@@ -119,7 +122,7 @@ model Submission {
   pasteAttempts Int       @default(0) @map("paste_attempts")
   fluencyScore  Decimal?  @map("fluency_score") @db.Decimal(5, 2)
   trace         Json? // CM6 ChangeSet deltas, gzipped — recorded from day one (FF-1 replay)
-  createdAt     DateTime  @default(now()) @map("created_at")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   attempt   Attempt   @relation(fields: [attemptId], references: [id])
   user      Profile   @relation(fields: [userId], references: [id])
@@ -137,11 +140,11 @@ model UserChallengeProgress {
   passesCount     Int       @default(0) @map("passes_count")
   bestFluency     Decimal?  @map("best_fluency") @db.Decimal(5, 2)
   emaFluency      Decimal?  @map("ema_fluency") @db.Decimal(5, 2) // EMA, α = 0.5
-  lastAttemptedAt DateTime? @map("last_attempted_at")
-  firstPassedAt   DateTime? @map("first_passed_at")
+  lastAttemptedAt DateTime? @map("last_attempted_at") @db.Timestamptz
+  firstPassedAt   DateTime? @map("first_passed_at") @db.Timestamptz
   srsIntervalDays Int       @default(0) @map("srs_interval_days")
   srsEase         Decimal   @default(2.5) @map("srs_ease") @db.Decimal(3, 2)
-  nextReviewAt    DateTime? @map("next_review_at")
+  nextReviewAt    DateTime? @map("next_review_at") @db.Timestamptz
 
   user      Profile   @relation(fields: [userId], references: [id])
   challenge Challenge @relation(fields: [challengeId], references: [id])

@@ -1,39 +1,26 @@
 import { Router } from "express";
-import { Prisma, prisma } from "@codereps/db";
+import { prisma } from "@codereps/db";
 import { requireAuth } from "../middleware/auth.js";
 
 export const authRouter = Router();
 
-/** Idempotent: creates the Profile row on first sign-in, no-ops afterwards. */
+function fallbackUsername(userId: string, email: string | undefined): string {
+  const local = email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 18);
+  // Suffix with a slice of the (unique) user id so this can never collide —
+  // the Postgres trigger (packages/db/supabase/migrations) is the primary
+  // creator; this upsert is the idempotent confirm, matching nomad-api's /sync.
+  return `${local || "user"}_${userId.replace(/-/g, "").slice(0, 6)}`;
+}
+
+/** Idempotent: the auth.users trigger usually creates the row first; this just confirms it. */
 authRouter.post("/sync", requireAuth, async (req, res) => {
   const user = req.user!;
-  const existing = await prisma.profile.findUnique({ where: { id: user.id } });
-  if (existing) {
-    res.json({ profile: existing, created: false });
-    return;
-  }
-
-  const fallback = `dev_${user.id.replace(/-/g, "").slice(0, 10)}`;
-  const preferred =
-    user.email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) ||
-    fallback;
-
-  try {
-    const profile = await prisma.profile.create({
-      data: { id: user.id, username: preferred },
-    });
-    res.status(201).json({ profile, created: true });
-  } catch (err) {
-    // Username taken by someone else → fall back to a per-user unique handle.
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
-      const profile = await prisma.profile.create({
-        data: { id: user.id, username: fallback },
-      });
-      res.status(201).json({ profile, created: true });
-      return;
-    }
-    throw err;
-  }
+  const profile = await prisma.profile.upsert({
+    where: { id: user.id },
+    create: { id: user.id, username: fallbackUsername(user.id, user.email) },
+    update: {},
+  });
+  res.json({ profile });
 });
 
 authRouter.get("/me", requireAuth, async (req, res) => {

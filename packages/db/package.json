@@ -15,15 +15,16 @@
     "build": "prisma generate && tsc",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
+    "push": "prisma db push",
     "studio": "prisma studio",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "^6.10.0"
+    "@prisma/client": "^6.19.3"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "prisma": "^6.10.0",
+    "prisma": "^6.19.3",
     "typescript": "^5.8.3"
   }
 }

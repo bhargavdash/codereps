@@ -34,10 +34,10 @@ export function LandingScreen() {
           <Logo size={22} textSize={17} />
         </Link>
         <div className="flex items-center gap-2.5">
-          <Link to="/warmup" className={buttonClasses("ghost", "md", "bg", "text-[oklch(0.75_0.01_250)] hover:text-ink")}>
+          <Link to="/login" className={buttonClasses("ghost", "md", "bg", "text-[oklch(0.75_0.01_250)] hover:text-ink")}>
             Sign in
           </Link>
-          <Link to="/warmup" className={buttonClasses("primary", "md")}>
+          <Link to="/login" className={buttonClasses("primary", "md")}>
             Start training
           </Link>
         </div>
