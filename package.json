@@ -8,7 +8,7 @@
     "build": "turbo build",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "lint": "pnpm verify-content",
+    "lint": "tsc --noEmit -p tsconfig.json && pnpm verify-content",
     "verify-content": "tsx scripts/verify-content.ts",
     "seed": "tsx scripts/seed.ts",
     "db:generate": "pnpm --filter @codereps/db generate",
@@ -16,6 +16,7 @@
     "db:studio": "pnpm --filter @codereps/db studio"
   },
   "devDependencies": {
+    "@types/node": "^24.13.2",
     "tsx": "^4.22.4",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
