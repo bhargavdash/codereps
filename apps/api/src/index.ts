@@ -1,7 +1,18 @@
-import "dotenv/config";
-import { prisma } from "@codereps/db";
-import { createApp } from "./app.js";
-import { env } from "./env.js";
+import { fileURLToPath } from "node:url";
+import { config as loadEnv } from "dotenv";
+
+loadEnv(); // apps/api/.env — PORT / WEB_ORIGIN / SUPABASE_URL
+// DATABASE_URL lives in packages/db/.env only (single source of truth for the
+// connection string; src/ and dist/ sit at the same depth so the relative
+// path holds for both). Both loads silently no-op in prod, where Railway
+// injects real env vars and no .env files exist.
+loadEnv({ path: fileURLToPath(new URL("../../../packages/db/.env", import.meta.url)) });
+
+// value imports AFTER env is loaded — @codereps/db instantiates PrismaClient
+// on import, and env.ts caches its snapshot on first call
+const { prisma } = await import("@codereps/db");
+const { createApp } = await import("./app.js");
+const { env } = await import("./env.js");
 
 const { port } = env();
 const server = createApp().listen(port, () => {

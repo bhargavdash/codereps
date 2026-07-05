@@ -79,7 +79,7 @@ model Challenge {
   tests            Json // discriminated union by runner; carries schemaVersion
   parSeconds       Int      @map("par_seconds") // author's verified solve time
   timeLimitSeconds Int      @map("time_limit_seconds")
-  tags             String[] // GIN index added in raw SQL migration (S0-5)
+  tags             String[] // GIN index: raw-SQL migration 20260705100000_challenge_tags_gin
   version          Int      @default(1)
   isPublished      Boolean  @default(false) @map("is_published")
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
