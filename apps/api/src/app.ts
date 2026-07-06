@@ -3,6 +3,7 @@ import cors from "cors";
 import { env } from "./env.js";
 import { authRouter } from "./routes/auth.js";
 import { challengesRouter } from "./routes/challenges.js";
+import { attemptsRouter } from "./routes/attempts.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 
 export function createApp(): express.Express {
@@ -17,7 +18,7 @@ export function createApp(): express.Express {
 
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/challenges", challengesRouter);
-  // attempts + submissions routers land in Sprint 3 (board S3-1/S3-2)
+  app.use("/api/v1/attempts", attemptsRouter);
 
   app.use(notFound);
   app.use(errorHandler);

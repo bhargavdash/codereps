@@ -4,7 +4,7 @@
  * apps/api assert the actual payload shape.
  */
 
-import type { Category, Language, Mode, Runner } from "./domain.js";
+import type { Category, Language, Mode, Runner, SubmissionStatus } from "./domain.js";
 import type { ChallengeTests } from "./challenge-schema.js";
 
 /** GET /api/v1/challenges list item — metadata only (LIST_SELECT). */
@@ -40,4 +40,47 @@ export interface ChallengeDetail extends ChallengeMeta {
 
 export interface ChallengeDetailResponse {
   challenge: ChallengeDetail;
+}
+
+/** POST /api/v1/attempts — the server-attested rep start (S3-1). */
+export interface AttemptResponse {
+  attemptId: string;
+  /** ISO timestamp from the server clock — the only clock that counts. */
+  startedAt: string;
+  timeLimitSeconds: number;
+}
+
+export interface SubmissionSummary {
+  id: string;
+  status: SubmissionStatus;
+  testsPassed: number;
+  testsTotal: number;
+  durationMs: number;
+  keystrokes: number;
+  pasteAttempts: number;
+  createdAt: string;
+}
+
+export interface StreakSummary {
+  current: number;
+  longest: number;
+  /** true when this submission is what qualified today. */
+  qualifiedToday: boolean;
+}
+
+/**
+ * POST /api/v1/attempts/:id/submit — the ONLY response that ever carries
+ * solutionCode (will-bite #2). Abandon returns the same shape.
+ */
+export interface SubmitResponse {
+  submission: SubmissionSummary;
+  fluency: {
+    score: number | null;
+    ema: number | null;
+    best: number | null;
+    isPersonalBest: boolean;
+  };
+  streak: StreakSummary;
+  solutionCode: string;
+  solutionNotesMd: string | null;
 }
