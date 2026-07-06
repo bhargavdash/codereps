@@ -4,14 +4,6 @@ import type { LibraryRow, ReadinessRow, WarmupRep } from "./types";
 export const USER = { initials: "JK", name: "Jordan K." };
 export const STREAK = { days: 14, alive: true };
 
-/** Live practice session seed for the current rep (debounce). Timer ticks up from here. */
-export const CURRENT_REP = {
-  slug: "debounce",
-  elapsedSeconds: 187, // 3:07
-  keystrokes: 342,
-  faults: 0,
-};
-
 /** Today's warmup — one session sheet, three reps. */
 export const WARMUP = {
   session: 214,

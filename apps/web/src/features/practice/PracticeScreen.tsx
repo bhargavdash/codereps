@@ -1,15 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LogoMark } from "../../components/ui/Logo";
 import { Avatar } from "../../components/ui/Avatar";
 import { StreakBadge } from "../../components/ui/StreakBadge";
+import { Skeleton } from "../../components/ui/Skeleton";
 import { FileCode } from "../../components/icons";
-import { CodeEditor } from "./CodeEditor";
+import { RepEditor } from "./RepEditor";
 import { PromptPanel } from "./PromptPanel";
 import { SessionRail } from "./SessionRail";
 import { useRepSession } from "./useRepSession";
-import { getChallenge } from "../../data/challenges";
-import { CURRENT_REP, STREAK, USER, WARMUP } from "../../data/app-data";
+import { useChallenge } from "./useChallenge";
+import { TraceRecorder } from "./trace";
+import { compileForRun } from "../../lib/compile";
+import { runJsChallenge } from "./runner/runJsChallenge";
+import type { RunResult } from "@codereps/shared/runner-core";
+import { STREAK, USER, WARMUP } from "../../data/app-data";
+import { useAuth } from "../../lib/auth-context";
 import { NotFound } from "../misc/NotFound";
 
 const LANG_LABEL: Record<string, string> = {
@@ -18,6 +24,13 @@ const LANG_LABEL: Record<string, string> = {
   tsx: "React · TSX",
   css: "CSS",
 };
+
+type RunInfo =
+  | { kind: "idle" }
+  | { kind: "running" }
+  | { kind: "compile-error"; message: string }
+  | { kind: "unavailable" }
+  | { kind: "result"; result: RunResult };
 
 function OffChip({ label }: { label: string }) {
   return (
@@ -28,35 +41,71 @@ function OffChip({ label }: { label: string }) {
   );
 }
 
+const FAULT_LABEL: Record<string, string> = {
+  paste: "paste resisted",
+  drop: "drop resisted",
+  "middle-click-paste": "paste resisted",
+};
+
 export function PracticeScreen() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const challenge = getChallenge(slug);
+  const { profile } = useAuth();
+  const { display: challenge, runnable, loading } = useChallenge(slug);
 
-  const seed =
-    slug === CURRENT_REP.slug
-      ? CURRENT_REP
-      : { elapsedSeconds: 0, keystrokes: 0, faults: 0 };
-
-  const [code, setCode] = useState(challenge?.starterCode ?? "");
+  const [code, setCode] = useState<string | null>(null); // null until starter known
   const [cursor, setCursor] = useState({ line: 1, col: 1 });
   const [promptOpen, setPromptOpen] = useState(
     typeof window === "undefined" ? true : window.innerWidth >= 1200,
   );
-  const [runState, setRunState] = useState<"idle" | "running" | "done">("idle");
+  const [runInfo, setRunInfo] = useState<RunInfo>({ kind: "idle" });
 
-  const session = useRepSession(challenge?.parSeconds ?? 240, seed);
+  const session = useRepSession(challenge?.parSeconds ?? 240);
+  const strictPaste =
+    (profile?.settings as { strictPaste?: boolean } | undefined)?.strictPaste ?? true;
+
+  // one ghost trace per rep, based on the real starter (will-bite #3)
+  const recorder = useMemo(
+    () => (challenge ? new TraceRecorder(challenge.starterCode) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [challenge?.slug, challenge?.starterCode],
+  );
+
+  // seed the editor once the (real or mock) starter is known
+  useEffect(() => {
+    setCode(challenge?.starterCode ?? null);
+    setRunInfo({ kind: "idle" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [challenge?.slug, challenge?.starterCode]);
 
   const repInfo = useMemo(() => {
     const idx = WARMUP.reps.findIndex((r) => r.slug === slug);
     return idx >= 0 ? { n: idx + 1, total: WARMUP.reps.length } : null;
   }, [slug]);
 
-  const submit = () => challenge && navigate(`/practice/${challenge.slug}/debrief`);
-  const run = () => {
-    setRunState("running");
-    window.setTimeout(() => setRunState("done"), 550);
+  const runningRef = useRef(false);
+  const run = async (): Promise<void> => {
+    if (runningRef.current || code === null) return;
+    if (!runnable || runnable.tests.kind !== "js_worker") {
+      setRunInfo({ kind: "unavailable" });
+      return;
+    }
+    runningRef.current = true;
+    setRunInfo({ kind: "running" });
+    try {
+      const compiled = compileForRun(code, runnable.language);
+      if (!compiled.ok) {
+        setRunInfo({ kind: "compile-error", message: compiled.message });
+        return;
+      }
+      const result = await runJsChallenge(compiled.code, runnable.tests);
+      setRunInfo({ kind: "result", result });
+    } finally {
+      runningRef.current = false;
+    }
   };
+
+  const submit = () => challenge && navigate(`/practice/${challenge.slug}/debrief`);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -65,18 +114,58 @@ export function PracticeScreen() {
         submit();
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "r") {
         e.preventDefault();
-        run();
+        void run();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [challenge]);
+  }, [challenge, runnable, code]);
 
+  if (loading) {
+    return (
+      <div className="flex h-screen flex-col gap-4 bg-bg p-8" aria-busy="true">
+        <Skeleton width={280} height={16} />
+        <Skeleton width="100%" height={2} />
+        <div className="flex flex-1 gap-6">
+          <Skeleton width={320} height={400} />
+          <div className="flex-1">
+            <Skeleton width="100%" height={400} />
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!challenge) return <NotFound />;
 
-  const passed = challenge.tests.filter((t) => t.passed).length;
   const editing = session.editing;
+
+  const statusStrip = (() => {
+    switch (runInfo.kind) {
+      case "running":
+        return { text: "running…", color: "var(--color-faint)" };
+      case "compile-error":
+        return { text: runInfo.message, color: "var(--color-fail)" };
+      case "unavailable":
+        return { text: "runner not available for this challenge yet", color: "var(--color-faint)" };
+      case "result": {
+        const r = runInfo.result;
+        const totalMs = r.cases.reduce((a, c) => a + c.ms, 0);
+        const color =
+          r.status === "passed"
+            ? "var(--color-pass)"
+            : r.status === "timeout"
+              ? "var(--color-timeout)"
+              : "var(--color-fail)";
+        const text = r.setupError
+          ? r.setupError
+          : `${r.casesPassed}/${r.casesTotal} · ${totalMs}ms`;
+        return { text, color };
+      }
+      default:
+        return { text: "no autocomplete", color: "var(--color-faint)" };
+    }
+  })();
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-bg">
@@ -122,7 +211,7 @@ export function PracticeScreen() {
         />
 
         {/* Editor — the hero, never recedes */}
-        <section className="flex min-w-0 flex-1 flex-col bg-editor">
+        <section className="relative flex min-w-0 flex-1 flex-col bg-editor">
           <div className="flex h-[42px] shrink-0 items-stretch border-b border-border pl-1">
             <div className="-mb-px flex items-center gap-2 border-b-2 border-primary px-4">
               <FileCode size={13} style={{ color: "var(--color-ink-mute)" }} />
@@ -134,19 +223,38 @@ export function PracticeScreen() {
               style={{ opacity: editing ? 0.5 : 1 }}
             >
               <OffChip label="AI OFF" />
-              <OffChip label="PASTE OFF" />
+              <OffChip label={strictPaste ? "PASTE OFF" : "PASTE COUNTED"} />
             </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-hidden">
-            <CodeEditor
-              value={code}
-              onChange={setCode}
-              language={challenge.language}
-              handlers={session.handlers}
-              onCursor={(line, col) => setCursor({ line, col })}
-            />
+            {code !== null && (
+              <RepEditor
+                value={code}
+                onChange={setCode}
+                language={challenge.language}
+                strictPaste={strictPaste}
+                onFault={session.recordFault}
+                onKeystrokes={session.addKeystrokes}
+                onTraceChanges={(changes) => recorder?.record(changes)}
+                onCursor={(line, col) => setCursor({ line, col })}
+                onFocusChange={session.setEditing}
+              />
+            )}
           </div>
+
+          {/* fault toast — honest, typographic, self-clearing */}
+          {session.lastFault && (
+            <div
+              key={session.lastFault.seq}
+              role="status"
+              className="pointer-events-none absolute right-4 top-[52px] rounded-md border border-border-2 bg-raised px-3 py-1.5"
+            >
+              <span className="mono text-[11.5px] tracking-[0.04em] text-accent">
+                {FAULT_LABEL[session.lastFault.kind]} · FAULT +1
+              </span>
+            </div>
+          )}
 
           <div className="flex h-8 shrink-0 items-center justify-between border-t border-border bg-bg px-4">
             <div className="flex items-center gap-4">
@@ -157,15 +265,11 @@ export function PracticeScreen() {
               <span className="mono text-[11.5px] text-muted-2">{LANG_LABEL[challenge.language]}</span>
             </div>
             <span
-              className="mono text-[11.5px]"
-              style={{ color: runState === "done" ? "var(--color-pass)" : "var(--color-faint)" }}
+              className="mono max-w-[60%] truncate text-[11.5px]"
+              style={{ color: statusStrip.color }}
               aria-live="polite"
             >
-              {runState === "running"
-                ? "running…"
-                : runState === "done"
-                  ? `${passed}/${challenge.tests.length} · ${challenge.tests.reduce((a, t) => a + t.ms, 0)}ms`
-                  : "no autocomplete"}
+              {statusStrip.text}
             </span>
           </div>
         </section>
@@ -178,10 +282,20 @@ export function PracticeScreen() {
           over={session.over}
           barPct={session.barPct}
           editing={editing}
-          onRun={run}
+          onRun={() => void run()}
           onSubmit={submit}
         />
       </div>
+
+      {/* dev-only metrics overlay (board S2-2 done-when) */}
+      {import.meta.env.DEV && (
+        <div className="pointer-events-none fixed bottom-3 left-3 z-50 rounded-md border border-border-2 bg-surface/90 px-3 py-2">
+          <span className="mono text-[10.5px] leading-relaxed text-muted">
+            keys {session.keystrokes} · faults {session.faults} · trace {recorder?.size ?? 0} ops ·{" "}
+            {runnable ? "runnable" : "mock"}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

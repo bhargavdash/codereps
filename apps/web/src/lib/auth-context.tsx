@@ -7,6 +7,8 @@ interface Profile {
   id: string;
   username: string;
   displayName: string | null;
+  /** e.g. { strictPaste: false } — schema Profile.settings jsonb */
+  settings?: Record<string, unknown>;
 }
 
 interface AuthContextValue {

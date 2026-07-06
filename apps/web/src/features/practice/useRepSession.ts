@@ -1,63 +1,72 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-const IGNORED_KEYS = new Set(["Shift", "Meta", "Control", "Alt", "CapsLock", "Fn"]);
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { FaultKind } from "./RepEditor";
 
 export interface RepSession {
   elapsed: number;
   keystrokes: number;
   faults: number;
+  /** Last fault, for the transient "resisted" toast. Cleared automatically. */
+  lastFault: { kind: FaultKind; seq: number } | null;
   editing: boolean;
   over: boolean;
   barPct: number;
-  handlers: {
-    keydown: (e: KeyboardEvent) => void;
-    paste: (e: ClipboardEvent) => boolean;
-    focus: () => void;
-    blur: () => void;
-  };
+  addKeystrokes: (delta: number) => void;
+  recordFault: (kind: FaultKind) => void;
+  setEditing: (editing: boolean) => void;
 }
 
 /**
- * The rep clock and its honest counters. Timer ticks up; every non-modifier
- * keystroke counts; paste is blocked and recorded as a fault; focusing the
- * editor puts the session "on the clock" so chrome can recede.
+ * The rep clock and its honest counters — board S2-2.
+ * Keystrokes arrive from RepEditor's updateListener (user-event transactions
+ * only — not raw keydowns, so shortcuts/IME noise don't inflate the count).
+ * The local timer is display-only; the server owns real durations (S3-1).
  */
-export function useRepSession(
-  parSeconds: number,
-  seed: { elapsedSeconds: number; keystrokes: number; faults: number },
-): RepSession {
-  const [elapsed, setElapsed] = useState(seed.elapsedSeconds);
-  const [keystrokes, setKeystrokes] = useState(seed.keystrokes);
-  const [faults, setFaults] = useState(seed.faults);
+export function useRepSession(parSeconds: number): RepSession {
+  const [elapsed, setElapsed] = useState(0);
+  const [keystrokes, setKeystrokes] = useState(0);
+  const [faults, setFaults] = useState(0);
+  const [lastFault, setLastFault] = useState<RepSession["lastFault"]>(null);
   const [editing, setEditing] = useState(false);
+  const faultSeq = useRef(0);
 
   useEffect(() => {
     const id = window.setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => window.clearInterval(id);
   }, []);
 
-  const keydown = useCallback((e: KeyboardEvent) => {
-    if (IGNORED_KEYS.has(e.key)) return;
-    if (e.metaKey || e.ctrlKey) return; // shortcuts aren't reps
-    setKeystrokes((k) => k + 1);
+  // the toast clears itself; a new fault re-triggers via seq
+  useEffect(() => {
+    if (!lastFault) return;
+    const id = window.setTimeout(() => setLastFault(null), 1800);
+    return () => window.clearTimeout(id);
+  }, [lastFault]);
+
+  const addKeystrokes = useCallback((delta: number) => {
+    setKeystrokes((k) => k + delta);
   }, []);
 
-  const paste = useCallback((e: ClipboardEvent) => {
-    e.preventDefault();
+  const recordFault = useCallback((kind: FaultKind) => {
+    faultSeq.current += 1;
     setFaults((f) => f + 1);
-    return true; // signal handled → block the paste
+    setLastFault({ kind, seq: faultSeq.current });
   }, []);
-
-  const focus = useCallback(() => setEditing(true), []);
-  const blur = useCallback(() => setEditing(false), []);
 
   const over = elapsed > parSeconds;
   const barPct = Math.min(100, (elapsed / parSeconds) * 100);
 
-  const handlers = useMemo(
-    () => ({ keydown, paste, focus, blur }),
-    [keydown, paste, focus, blur],
+  return useMemo(
+    () => ({
+      elapsed,
+      keystrokes,
+      faults,
+      lastFault,
+      editing,
+      over,
+      barPct,
+      addKeystrokes,
+      recordFault,
+      setEditing,
+    }),
+    [elapsed, keystrokes, faults, lastFault, editing, over, barPct, addKeystrokes, recordFault],
   );
-
-  return { elapsed, keystrokes, faults, editing, over, barPct, handlers };
 }

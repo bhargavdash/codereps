@@ -23,6 +23,11 @@ import { CONTENT_DIR, dim, green, loadChallenges, red, ROOT, type LoadFailure } 
 
 const ts = tsPkg as unknown as TsModule;
 
+// --stress N (board S2-6): re-run fake-clock challenges N times to prove the
+// timing harness is deterministic — debounce/throttle must never flake.
+const stressArg = process.argv.indexOf("--stress");
+const STRESS_RUNS = stressArg >= 0 ? Math.max(1, Number(process.argv[stressArg + 1]) || 50) : 1;
+
 function transpileIfNeeded(challenge: ChallengeFile): string {
   if (challenge.language === "javascript") return challenge.solutionCode;
   return ts.transpileModule(challenge.solutionCode, {
@@ -51,8 +56,15 @@ async function main(): Promise<void> {
 
     switch (challenge.tests.kind) {
       case "js_worker": {
-        const result = await runJsWorkerTests(transpileIfNeeded(challenge), challenge.tests);
-        if (result.status !== "passed") problems.push(...describeRunFailures(result));
+        const runs = challenge.tests.needsFakeClock ? STRESS_RUNS : 1;
+        for (let i = 1; i <= runs; i++) {
+          const result = await runJsWorkerTests(transpileIfNeeded(challenge), challenge.tests);
+          if (result.status !== "passed") {
+            const prefix = runs > 1 ? `run ${i}/${runs}: ` : "";
+            problems.push(...describeRunFailures(result).map((p) => prefix + p));
+            break;
+          }
+        }
         break;
       }
       case "ts_check": {
