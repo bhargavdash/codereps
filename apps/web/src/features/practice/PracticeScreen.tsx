@@ -12,8 +12,9 @@ import { useRepSession } from "./useRepSession";
 import { useChallenge } from "./useChallenge";
 import { useAttempt } from "./useAttempt";
 import { TraceRecorder } from "./trace";
-import { compileForRun } from "../../lib/compile";
-import { runJsChallenge } from "./runner/runJsChallenge";
+import { runChallenge } from "./runner/runChallenge";
+import { ReactIframeRunner } from "./runner/ReactIframeRunner";
+import { warmTsChecker } from "./runner/runTsChallenge";
 import type { RunResult } from "@codereps/shared/runner-core";
 import type { ClientCaseResult, ClientResults, SubmitResponse } from "@codereps/shared";
 import type { DebriefState } from "../results/debrief-state";
@@ -111,28 +112,41 @@ export function PracticeScreen() {
     return idx >= 0 ? { n: idx + 1, total: WARMUP.reps.length } : null;
   }, [slug]);
 
+  // per-runner warm-up: react gets its sandboxed iframe ahead of time,
+  // ts_check starts downloading the compiler (S4-1/S4-2)
+  const reactRunner = useMemo(
+    () => (runnable?.tests.kind === "react_iframe" ? new ReactIframeRunner() : null),
+    [runnable],
+  );
+  useEffect(() => {
+    if (reactRunner) {
+      reactRunner.warm();
+      return () => reactRunner.destroy();
+    }
+    if (runnable?.tests.kind === "ts_check") warmTsChecker();
+  }, [reactRunner, runnable]);
+
   const runningRef = useRef(false);
   const run = useCallback(async (): Promise<RunResult | { compileError: string } | null> => {
     if (runningRef.current || code === null) return null;
-    if (!runnable || runnable.tests.kind !== "js_worker") {
+    if (!runnable) {
       setRunInfo({ kind: "unavailable" });
       return null;
     }
     runningRef.current = true;
     setRunInfo({ kind: "running" });
     try {
-      const compiled = compileForRun(code, runnable.language);
-      if (!compiled.ok) {
-        setRunInfo({ kind: "compile-error", message: compiled.message });
-        return { compileError: compiled.message };
+      const outcome = await runChallenge(code, runnable, { react: reactRunner ?? undefined });
+      if (!outcome.ok) {
+        setRunInfo({ kind: "compile-error", message: outcome.compileError });
+        return { compileError: outcome.compileError };
       }
-      const result = await runJsChallenge(compiled.code, runnable.tests);
-      setRunInfo({ kind: "result", result });
-      return result;
+      setRunInfo({ kind: "result", result: outcome.result });
+      return outcome.result;
     } finally {
       runningRef.current = false;
     }
-  }, [code, runnable]);
+  }, [code, runnable, reactRunner]);
 
   const finishedRef = useRef(false);
   const finishRep = useCallback(
@@ -142,7 +156,7 @@ export function PracticeScreen() {
       try {
         let clientResults: ClientResults | null = null; // stays null for abandon
         let cases: ClientCaseResult[] = [];
-        const totalCases = runnable.tests.kind === "js_worker" ? runnable.tests.cases.length : 0;
+        const totalCases = runnable.tests.cases.length; // every tests kind carries cases
 
         if (mode === "auto-timeout") {
           clientResults = { status: "timeout", casesPassed: 0, casesTotal: totalCases, cases: [] };
