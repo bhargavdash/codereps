@@ -10,6 +10,8 @@ export interface DebriefState {
   yourCode: string;
   cases: ClientCaseResult[];
   faults: number;
+  /** Present when the rep was reached from today's warmup (S4-4). */
+  warmup?: { slugs: string[]; n: number };
   display: {
     slug: string;
     title: string;

@@ -3,11 +3,12 @@ import { cn } from "../../lib/cn";
 import { Logo } from "../ui/Logo";
 import { StreakBadge } from "../ui/StreakBadge";
 import { AccountMenu } from "./AccountMenu";
-import { STREAK, WARMUP } from "../../data/app-data";
+import { STREAK } from "../../data/app-data";
 
+// mock-era "Practice" tab removed with S4-4: reps are entered from the
+// warmup sheet or the library, and the practice screen has its own chrome
 const tabs = [
   { label: "Warmup", to: "/warmup", match: "/warmup" },
-  { label: "Practice", to: `/practice/${WARMUP.activeSlug}`, match: "/practice" },
   { label: "Log", to: "/log", match: "/log" },
   { label: "Library", to: "/library", match: "/library" },
 ];

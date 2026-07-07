@@ -5,7 +5,6 @@ import { RepDots } from "../../components/ui/RepDots";
 import { Check, ChevronLeft, ChevronRight, ClockAlert, Cross, Lock } from "../../components/icons";
 import { ReadOnlyCode } from "./ReadOnlyCode";
 import type { DebriefState } from "./debrief-state";
-import { WARMUP } from "../../data/app-data";
 import { CATEGORY_LABEL, type Challenge } from "../../data/types";
 import { diffLines } from "../../lib/line-diff";
 import { fmtClock, fmtDelta } from "../../lib/format";
@@ -78,8 +77,10 @@ export function DebriefScreen() {
   const parRatio = (timeSeconds / display.parSeconds).toFixed(2);
   const totalTestMs = cases.reduce((a, c) => a + c.ms, 0);
 
-  const nextIdx = WARMUP.reps.findIndex((r) => r.slug === slug) + 1;
-  const next = WARMUP.reps[nextIdx];
+  // warmup context threads from the practice screen; outside a warmup the
+  // debrief points back at the library
+  const warmup = state.warmup;
+  const nextSlug = warmup ? warmup.slugs[warmup.n + 1] : undefined;
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
@@ -93,6 +94,11 @@ export function DebriefScreen() {
           <span className="text-sm font-medium text-[oklch(0.9_0.005_250)]">Debrief</span>
         </div>
         <div className="flex items-center gap-4">
+          {warmup && (
+            <span className="mono text-[12.5px] text-muted">
+              Rep {warmup.n + 1} of {warmup.slugs.length}
+            </span>
+          )}
           <span className="mono text-[12.5px] text-muted">
             streak <span className="text-ink">{submit.streak.current}</span>
             {submit.streak.qualifiedToday ? " · today counts" : ""}
@@ -100,10 +106,16 @@ export function DebriefScreen() {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => navigate(next ? `/practice/${next.slug}` : "/library")}
+            onClick={() =>
+              nextSlug && warmup
+                ? navigate(`/practice/${nextSlug}`, {
+                    state: { warmup: { slugs: warmup.slugs, n: warmup.n + 1 } },
+                  })
+                : navigate(warmup ? "/warmup" : "/library")
+            }
             className="gap-2 px-4 py-[9px] text-[13.5px]"
           >
-            {next ? "Next rep" : "Back to library"}
+            {nextSlug ? "Next rep" : warmup ? "Finish warmup" : "Back to library"}
             <ChevronRight size={14} />
           </Button>
         </div>

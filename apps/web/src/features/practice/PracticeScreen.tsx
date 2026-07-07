@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { LogoMark } from "../../components/ui/Logo";
 import { Avatar } from "../../components/ui/Avatar";
 import { StreakBadge } from "../../components/ui/StreakBadge";
@@ -19,7 +19,8 @@ import type { RunResult } from "@codereps/shared/runner-core";
 import type { ClientCaseResult, ClientResults, SubmitResponse } from "@codereps/shared";
 import type { DebriefState } from "../results/debrief-state";
 import { api } from "../../lib/api";
-import { STREAK, USER, WARMUP } from "../../data/app-data";
+import type { WarmupNavState } from "../warmup/WarmupScreen";
+import { STREAK, USER } from "../../data/app-data";
 import { useAuth } from "../../lib/auth-context";
 import { NotFound } from "../misc/NotFound";
 
@@ -107,10 +108,11 @@ export function PracticeScreen() {
     return () => window.clearTimeout(id);
   }, [abandonArmed]);
 
-  const repInfo = useMemo(() => {
-    const idx = WARMUP.reps.findIndex((r) => r.slug === slug);
-    return idx >= 0 ? { n: idx + 1, total: WARMUP.reps.length } : null;
-  }, [slug]);
+  const location = useLocation();
+  const warmupCtx = (location.state as WarmupNavState | null)?.warmup ?? null;
+  const repInfo = warmupCtx
+    ? { n: warmupCtx.n + 1, total: warmupCtx.slugs.length }
+    : null;
 
   // per-runner warm-up: react gets its sandboxed iframe ahead of time,
   // ts_check starts downloading the compiler (S4-1/S4-2)
@@ -195,6 +197,7 @@ export function PracticeScreen() {
           yourCode: code,
           cases,
           faults: session.faults,
+          warmup: warmupCtx ?? undefined,
           display: {
             slug: challenge.slug,
             title: challenge.title,
@@ -215,7 +218,7 @@ export function PracticeScreen() {
         setSubmitting(false);
       }
     },
-    [attempt, runnable, challenge, code, session.keystrokes, session.faults, recorder, run, navigate, submitting],
+    [attempt, runnable, challenge, code, session.keystrokes, session.faults, recorder, run, navigate, submitting, warmupCtx],
   );
 
   // time-limit expiry → auto-submit timeout (board S3-1)

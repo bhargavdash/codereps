@@ -42,6 +42,19 @@ export interface ChallengeDetailResponse {
   challenge: ChallengeDetail;
 }
 
+/** GET /api/v1/warmup — today's 3, deterministic per (user, date) (S4-4). */
+export interface WarmupRepEntry {
+  n: number;
+  kind: "review" | "new";
+  done: boolean;
+  challenge: ChallengeMeta;
+}
+
+export interface WarmupResponse {
+  date: string;
+  reps: WarmupRepEntry[];
+}
+
 /** POST /api/v1/attempts — the server-attested rep start (S3-1). */
 export interface AttemptResponse {
   attemptId: string;

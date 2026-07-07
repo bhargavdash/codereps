@@ -1,23 +1,30 @@
 import { Link, useNavigate } from "react-router-dom";
 import { AppShell } from "../../components/layout/AppShell";
 import { Button } from "../../components/ui/Button";
+import { Skeleton } from "../../components/ui/Skeleton";
 import { Check, Play } from "../../components/icons";
 import { fmtClock } from "../../lib/format";
-import { WARMUP } from "../../data/app-data";
-import type { WarmupRep } from "../../data/types";
+import { CATEGORY_LABEL } from "../../data/types";
+import { useWarmup } from "./useWarmup";
+import type { WarmupRepEntry } from "@codereps/shared";
 
-const KIND_LABEL: Record<WarmupRep["kind"], string> = {
+/** Router state handed to the practice screen so it knows its place in the session. */
+export interface WarmupNavState {
+  warmup: { slugs: string[]; n: number };
+}
+
+type RepState = "done" | "now" | "todo";
+
+const KIND_LABEL: Record<WarmupRepEntry["kind"], string> = {
   review: "REVIEW",
-  "weak-spot": "WEAK SPOT",
   new: "NEW",
 };
-const KIND_COLOR: Record<WarmupRep["kind"], string> = {
+const KIND_COLOR: Record<WarmupRepEntry["kind"], string> = {
   review: "var(--color-muted)",
-  "weak-spot": "var(--color-accent)",
   new: "var(--color-primary-mid)",
 };
 
-function StateBadge({ state }: { state: WarmupRep["state"] }) {
+function StateBadge({ state }: { state: RepState }) {
   if (state === "done")
     return (
       <span className="flex w-[84px] items-center justify-end gap-1.5" style={{ color: "var(--color-pass)" }}>
@@ -40,12 +47,17 @@ function StateBadge({ state }: { state: WarmupRep["state"] }) {
   );
 }
 
-function RepRow({ rep }: { rep: WarmupRep }) {
-  const to = rep.state === "done" ? `/practice/${rep.slug}/debrief` : `/practice/${rep.slug}`;
-  const isNow = rep.state === "now";
+function topicFromTags(tags: string[]): string {
+  const tag = tags.find((t) => t !== "par-unverified");
+  return tag ? tag.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : "";
+}
+
+function RepRow({ rep, state, navState }: { rep: WarmupRepEntry; state: RepState; navState: WarmupNavState }) {
+  const isNow = state === "now";
   return (
     <Link
-      to={to}
+      to={`/practice/${rep.challenge.slug}`}
+      state={navState}
       className={
         "group flex items-center gap-5 rounded-md px-1 py-5 transition-colors " +
         "[&:not(:last-child)]:border-b [&:not(:last-child)]:border-border " +
@@ -66,70 +78,135 @@ function RepRow({ rep }: { rep: WarmupRep }) {
         <span
           className="text-[15.5px] font-medium"
           style={
-            rep.state === "done"
+            state === "done"
               ? { color: "var(--color-muted)", textDecoration: "line-through", textDecorationColor: "var(--color-faint)" }
               : { color: isNow ? "var(--color-ink-hi)" : "var(--color-ink)" }
           }
         >
-          {rep.title}
+          {rep.challenge.title}
         </span>
-        <span className="text-[12.5px] text-muted">{rep.subtitle}</span>
+        <span className="text-[12.5px] text-muted">
+          {CATEGORY_LABEL[rep.challenge.category]} · {topicFromTags(rep.challenge.tags)} · D{rep.challenge.difficulty}
+        </span>
       </span>
-      <span className="mono w-[62px] text-right text-[12.5px] text-muted">PAR {fmtClock(rep.parSeconds)}</span>
-      <StateBadge state={rep.state} />
+      <span className="mono w-[62px] text-right text-[12.5px] text-muted">PAR {fmtClock(rep.challenge.parSeconds)}</span>
+      <StateBadge state={state} />
     </Link>
   );
 }
 
 export function WarmupScreen() {
   const navigate = useNavigate();
-  const activeRep = WARMUP.reps.find((r) => r.slug === WARMUP.activeSlug);
+  const { state, retry } = useWarmup();
+
+  const dateLabel =
+    state.status === "ready"
+      ? new Date(`${state.warmup.date}T00:00:00`).toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        })
+      : "";
+
+  const reps = state.status === "ready" ? state.warmup.reps : [];
+  const activeIdx = reps.findIndex((r) => !r.done);
+  const allDone = state.status === "ready" && reps.length > 0 && activeIdx === -1;
+  const estMinutes = Math.max(1, Math.ceil(reps.reduce((a, r) => a + r.challenge.parSeconds, 0) / 60));
+  const navState: WarmupNavState = {
+    warmup: { slugs: reps.map((r) => r.challenge.slug), n: Math.max(0, activeIdx) },
+  };
+
   return (
     <AppShell>
       <div className="flex items-start justify-center px-10 py-[52px]">
         <div className="w-[780px] max-w-full overflow-hidden rounded-xl border border-border bg-surface-2 shadow-[0_24px_60px_-30px_oklch(0_0_0_/_0.7)]">
-          <div className="h-1 bg-primary" />
+          <div className="h-1" style={{ background: allDone ? "var(--color-pass)" : "var(--color-primary)" }} />
           <div className="px-10 pb-9 pt-[34px]">
             <div className="mb-2 flex items-start justify-between">
               <div className="flex flex-col gap-1.5">
                 <h1 className="text-[27px] font-semibold tracking-[-0.015em]">Today&rsquo;s warmup</h1>
-                <span className="text-sm text-muted">{WARMUP.dateLabel}</span>
+                <span className="text-sm text-muted">
+                  {state.status === "ready" ? dateLabel : <Skeleton width={140} />}
+                </span>
               </div>
-              <span className="mono pt-1.5 text-[11.5px] tracking-[0.06em] text-muted-2">
-                SESSION {WARMUP.session} · ~{WARMUP.estMinutes} MIN
-              </span>
+              {state.status === "ready" && !allDone && (
+                <span className="mono pt-1.5 text-[11.5px] tracking-[0.06em] text-muted-2">
+                  ~{estMinutes} MIN AT PAR
+                </span>
+              )}
             </div>
             <p className="mb-7 text-[15px] leading-[1.55] text-muted">
-              Three reps: one you know, one that&rsquo;s slipping, one you&rsquo;ve never done. Same shape
-              every morning.
+              Three reps, same three all day. Reviews keep old patterns warm; new ones stretch the
+              range.
             </p>
 
-            <div className="flex flex-col border-t border-border">
-              {WARMUP.reps.map((rep) => (
-                <RepRow key={rep.n} rep={rep} />
-              ))}
-            </div>
-
-            <div className="mt-8 flex items-center justify-between">
-              <Button
-                variant="primary"
-                size="lg"
-                offset="surface-2"
-                onClick={() => navigate(`/practice/${WARMUP.activeSlug}`)}
-                className="gap-2.5"
-              >
-                <Play size={15} />
-                Resume — Rep {activeRep?.n} of {WARMUP.reps.length}
-              </Button>
-              <div className="flex items-center gap-1.5">
-                <Button variant="ghost" size="md" className="text-[13.5px] text-muted hover:text-ink">
-                  Rebuild session
-                </Button>
-                <Button variant="ghost" size="md" className="text-[13.5px] text-muted-2 hover:text-ink">
-                  Skip today
+            {state.status === "loading" ? (
+              <div className="flex flex-col gap-6 border-t border-border pt-6" aria-busy="true">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex items-center gap-5">
+                    <Skeleton width={16} />
+                    <Skeleton width={70} />
+                    <span className="flex-1">
+                      <Skeleton width={`${55 - i * 10}%`} height={14} />
+                    </span>
+                    <Skeleton width={60} />
+                  </div>
+                ))}
+              </div>
+            ) : state.status === "error" ? (
+              <div className="flex flex-col items-center gap-3 border-t border-border py-12 text-center" role="alert">
+                <span className="text-[15px] font-medium text-ink">Couldn&rsquo;t load the session</span>
+                <span className="text-[13px] text-muted">{state.message}</span>
+                <Button variant="secondary" size="sm" offset="surface-2" onClick={retry}>
+                  Try again
                 </Button>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col border-t border-border">
+                {reps.map((rep, i) => (
+                  <RepRow
+                    key={rep.challenge.slug}
+                    rep={rep}
+                    state={rep.done ? "done" : i === activeIdx ? "now" : "todo"}
+                    navState={{ warmup: { slugs: navState.warmup.slugs, n: i } }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {state.status === "ready" && (
+              <div className="mt-8 flex items-center justify-between">
+                {allDone ? (
+                  <div className="flex items-center gap-3" style={{ color: "var(--color-pass)" }}>
+                    <Check size={18} />
+                    <span className="text-[15px] font-medium">
+                      Session complete — {reps.length} reps logged.
+                    </span>
+                    <Link
+                      to="/library"
+                      className="ml-2 text-[13.5px] text-muted underline-offset-4 hover:text-ink hover:underline"
+                    >
+                      Keep going in the library
+                    </Link>
+                  </div>
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    offset="surface-2"
+                    onClick={() =>
+                      navigate(`/practice/${reps[activeIdx]!.challenge.slug}`, { state: navState })
+                    }
+                    className="gap-2.5"
+                  >
+                    <Play size={15} />
+                    {reps.some((r) => r.done)
+                      ? `Resume — Rep ${activeIdx + 1} of ${reps.length}`
+                      : "Start warmup"}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

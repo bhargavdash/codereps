@@ -5,42 +5,7 @@ export const USER = { initials: "JK", name: "Jordan K." };
 export const STREAK = { days: 14, alive: true };
 
 /** Today's warmup — one session sheet, three reps. */
-export const WARMUP = {
-  session: 214,
-  dateLabel: "Thursday, July 3",
-  estMinutes: 12,
-  activeSlug: "discriminated-unions",
-  reps: [
-    {
-      n: 1,
-      kind: "review",
-      slug: "debounce",
-      title: "Debounce",
-      subtitle: "JavaScript · Timing · trained 2d ago, keep it sharp",
-      parSeconds: 240,
-      state: "done",
-    },
-    {
-      n: 2,
-      kind: "weak-spot",
-      slug: "discriminated-unions",
-      title: "Discriminated unions",
-      subtitle: "TypeScript · fluency 61 and decaying",
-      parSeconds: 300,
-      state: "now",
-    },
-    {
-      n: 3,
-      kind: "new",
-      slug: "usereducer-from-scratch",
-      title: "useReducer from scratch",
-      subtitle: "React · never trained — sets your baseline",
-      parSeconds: 360,
-      state: "todo",
-    },
-  ] satisfies WarmupRep[],
-};
-
+// Warmup mock removed 2026-07-07 (S4-4): WarmupScreen reads GET /api/v1/warmup.
 /** Debrief summary for the just-submitted debounce rep — reads like a race result. */
 export const DEBRIEF = {
   slug: "debounce",
