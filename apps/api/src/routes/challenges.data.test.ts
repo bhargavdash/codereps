@@ -23,7 +23,8 @@ vi.mock("../middleware/auth.js", () => ({
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 
-describe.skipIf(!hasDb)("challenges API against seeded data", () => {
+// remote DB + the leak sweep grows with the content library (one request per challenge)
+describe.skipIf(!hasDb)("challenges API against seeded data", { timeout: 60_000 }, () => {
   let app: Express;
   let db: typeof import("@codereps/db");
 
