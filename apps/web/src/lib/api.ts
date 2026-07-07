@@ -7,6 +7,8 @@ export class ApiError extends Error {
     public status: number,
     public code: string,
     message: string,
+    /** The full error payload — some errors carry extra fields (e.g. attempt_open → attemptId). */
+    public details?: Record<string, unknown>,
   ) {
     super(message);
   }
@@ -33,6 +35,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
       res.status,
       body?.error?.code ?? "unknown",
       body?.error?.message ?? `Request failed: ${res.status}`,
+      body?.error,
     );
   }
   return body as T;

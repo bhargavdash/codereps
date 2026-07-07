@@ -56,10 +56,23 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            {/* Practice + debrief stay open (no submission persistence until Sprint 3,
-                which is also when these routes start requiring a session). */}
-            <Route path="/practice/:slug" element={<PracticeScreen />} />
-            <Route path="/practice/:slug/debrief" element={<DebriefScreen />} />
+            {/* Gated since S3-1: reps persist now, so a session is required. */}
+            <Route
+              path="/practice/:slug"
+              element={
+                <ProtectedRoute>
+                  <PracticeScreen />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/practice/:slug/debrief"
+              element={
+                <ProtectedRoute>
+                  <DebriefScreen />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/design-system" element={<DesignSystemScreen />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

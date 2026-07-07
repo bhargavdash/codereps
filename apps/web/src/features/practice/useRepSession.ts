@@ -16,12 +16,13 @@ export interface RepSession {
 }
 
 /**
- * The rep clock and its honest counters — board S2-2.
+ * The rep clock and its honest counters — board S2-2/S3-1.
  * Keystrokes arrive from RepEditor's updateListener (user-event transactions
  * only — not raw keydowns, so shortcuts/IME noise don't inflate the count).
- * The local timer is display-only; the server owns real durations (S3-1).
+ * When the server-attested attempt exists, elapsed derives from its
+ * startedAt (the only clock that counts); otherwise a local 0-based timer.
  */
-export function useRepSession(parSeconds: number): RepSession {
+export function useRepSession(parSeconds: number, startedAt?: Date | null): RepSession {
   const [elapsed, setElapsed] = useState(0);
   const [keystrokes, setKeystrokes] = useState(0);
   const [faults, setFaults] = useState(0);
@@ -30,9 +31,15 @@ export function useRepSession(parSeconds: number): RepSession {
   const faultSeq = useRef(0);
 
   useEffect(() => {
-    const id = window.setInterval(() => setElapsed((e) => e + 1), 1000);
+    const fromServer = () =>
+      Math.max(0, Math.floor((Date.now() - (startedAt as Date).getTime()) / 1000));
+    if (startedAt) setElapsed(fromServer());
+    const id = window.setInterval(
+      () => setElapsed((e) => (startedAt ? fromServer() : e + 1)),
+      1000,
+    );
     return () => window.clearInterval(id);
-  }, []);
+  }, [startedAt]);
 
   // the toast clears itself; a new fault re-triggers via seq
   useEffect(() => {

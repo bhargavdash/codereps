@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LogoMark } from "../../components/ui/Logo";
 import { Avatar } from "../../components/ui/Avatar";
@@ -10,10 +10,14 @@ import { PromptPanel } from "./PromptPanel";
 import { SessionRail } from "./SessionRail";
 import { useRepSession } from "./useRepSession";
 import { useChallenge } from "./useChallenge";
+import { useAttempt } from "./useAttempt";
 import { TraceRecorder } from "./trace";
 import { compileForRun } from "../../lib/compile";
 import { runJsChallenge } from "./runner/runJsChallenge";
 import type { RunResult } from "@codereps/shared/runner-core";
+import type { ClientCaseResult, ClientResults, SubmitResponse } from "@codereps/shared";
+import type { DebriefState } from "../results/debrief-state";
+import { api } from "../../lib/api";
 import { STREAK, USER, WARMUP } from "../../data/app-data";
 import { useAuth } from "../../lib/auth-context";
 import { NotFound } from "../misc/NotFound";
@@ -30,6 +34,7 @@ type RunInfo =
   | { kind: "running" }
   | { kind: "compile-error"; message: string }
   | { kind: "unavailable" }
+  | { kind: "submit-error"; message: string }
   | { kind: "result"; result: RunResult };
 
 function OffChip({ label }: { label: string }) {
@@ -47,36 +52,59 @@ const FAULT_LABEL: Record<string, string> = {
   "middle-click-paste": "paste resisted",
 };
 
+function toClientResults(result: RunResult): ClientResults {
+  const cases: ClientCaseResult[] = result.cases.map((c) => ({
+    name: c.name.slice(0, 200),
+    status: c.status,
+    ms: Math.max(0, Math.round(c.ms)),
+    ...(c.message && { message: c.message.slice(0, 2000) }),
+  }));
+  return {
+    status: result.status,
+    casesPassed: result.casesPassed,
+    casesTotal: result.casesTotal,
+    cases,
+  };
+}
+
 export function PracticeScreen() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
   const { display: challenge, runnable, loading } = useChallenge(slug);
+  const { attempt } = useAttempt(runnable?.id);
 
-  const [code, setCode] = useState<string | null>(null); // null until starter known
+  const [code, setCode] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ line: 1, col: 1 });
   const [promptOpen, setPromptOpen] = useState(
     typeof window === "undefined" ? true : window.innerWidth >= 1200,
   );
   const [runInfo, setRunInfo] = useState<RunInfo>({ kind: "idle" });
+  const [submitting, setSubmitting] = useState(false);
+  const [abandonArmed, setAbandonArmed] = useState(false);
 
-  const session = useRepSession(challenge?.parSeconds ?? 240);
+  const session = useRepSession(challenge?.parSeconds ?? 240, attempt?.startedAt ?? null);
   const strictPaste =
     (profile?.settings as { strictPaste?: boolean } | undefined)?.strictPaste ?? true;
 
-  // one ghost trace per rep, based on the real starter (will-bite #3)
   const recorder = useMemo(
     () => (challenge ? new TraceRecorder(challenge.starterCode) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [challenge?.slug, challenge?.starterCode],
   );
 
-  // seed the editor once the (real or mock) starter is known
   useEffect(() => {
     setCode(challenge?.starterCode ?? null);
     setRunInfo({ kind: "idle" });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [challenge?.slug, challenge?.starterCode]);
+
+  // the abandon confirm-beat disarms itself
+  useEffect(() => {
+    if (!abandonArmed) return;
+    const id = window.setTimeout(() => setAbandonArmed(false), 3000);
+    return () => window.clearTimeout(id);
+  }, [abandonArmed]);
 
   const repInfo = useMemo(() => {
     const idx = WARMUP.reps.findIndex((r) => r.slug === slug);
@@ -84,11 +112,11 @@ export function PracticeScreen() {
   }, [slug]);
 
   const runningRef = useRef(false);
-  const run = async (): Promise<void> => {
-    if (runningRef.current || code === null) return;
+  const run = useCallback(async (): Promise<RunResult | { compileError: string } | null> => {
+    if (runningRef.current || code === null) return null;
     if (!runnable || runnable.tests.kind !== "js_worker") {
       setRunInfo({ kind: "unavailable" });
-      return;
+      return null;
     }
     runningRef.current = true;
     setRunInfo({ kind: "running" });
@@ -96,22 +124,120 @@ export function PracticeScreen() {
       const compiled = compileForRun(code, runnable.language);
       if (!compiled.ok) {
         setRunInfo({ kind: "compile-error", message: compiled.message });
-        return;
+        return { compileError: compiled.message };
       }
       const result = await runJsChallenge(compiled.code, runnable.tests);
       setRunInfo({ kind: "result", result });
+      return result;
     } finally {
       runningRef.current = false;
     }
-  };
+  }, [code, runnable]);
 
-  const submit = () => challenge && navigate(`/practice/${challenge.slug}/debrief`);
+  const finishedRef = useRef(false);
+  const finishRep = useCallback(
+    async (mode: "submit" | "abandon" | "auto-timeout"): Promise<void> => {
+      if (!attempt || !runnable || !challenge || finishedRef.current || submitting || code === null) return;
+      setSubmitting(true);
+      try {
+        let clientResults: ClientResults | null = null; // stays null for abandon
+        let cases: ClientCaseResult[] = [];
+        const totalCases = runnable.tests.kind === "js_worker" ? runnable.tests.cases.length : 0;
 
+        if (mode === "auto-timeout") {
+          clientResults = { status: "timeout", casesPassed: 0, casesTotal: totalCases, cases: [] };
+        } else if (mode === "submit") {
+          const outcome = await run();
+          if (outcome === null) return;
+          clientResults =
+            "compileError" in outcome
+              ? {
+                  status: "error",
+                  casesPassed: 0,
+                  casesTotal: totalCases,
+                  cases: [{ name: "compile", status: "error", ms: 0, message: outcome.compileError }],
+                }
+              : toClientResults(outcome);
+          cases = clientResults.cases;
+        }
+
+        const metrics = { keystrokes: session.keystrokes, pasteAttempts: session.faults };
+        const traceGz = await recorder?.serialize().catch(() => undefined);
+
+        const submit =
+          mode === "abandon"
+            ? await api<SubmitResponse>(`/api/v1/attempts/${attempt.attemptId}/abandon`, {
+                method: "POST",
+                body: JSON.stringify({ code, metrics }),
+              })
+            : await api<SubmitResponse>(`/api/v1/attempts/${attempt.attemptId}/submit`, {
+                method: "POST",
+                body: JSON.stringify({ code, clientResults, metrics, traceGz }),
+              });
+
+        finishedRef.current = true;
+        const state: DebriefState = {
+          submit,
+          yourCode: code,
+          cases,
+          faults: session.faults,
+          display: {
+            slug: challenge.slug,
+            title: challenge.title,
+            category: challenge.category,
+            topic: challenge.topic,
+            difficulty: challenge.difficulty,
+            parSeconds: challenge.parSeconds,
+            language: challenge.language,
+          },
+        };
+        navigate(`/practice/${challenge.slug}/debrief`, { state });
+      } catch (err) {
+        setRunInfo({
+          kind: "submit-error",
+          message: err instanceof Error ? err.message : "Submit failed — try again",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [attempt, runnable, challenge, code, session.keystrokes, session.faults, recorder, run, navigate, submitting],
+  );
+
+  // time-limit expiry → auto-submit timeout (board S3-1)
+  useEffect(() => {
+    if (!attempt || finishedRef.current) return;
+    if (session.elapsed >= attempt.timeLimitSeconds) {
+      void finishRep("auto-timeout");
+    }
+  }, [session.elapsed, attempt, finishRep]);
+
+  // refresh/close guard while a rep is open (critique backlog P1)
+  useEffect(() => {
+    if (!attempt) return;
+    const guard = (e: BeforeUnloadEvent) => {
+      if (!finishedRef.current) e.preventDefault();
+    };
+    window.addEventListener("beforeunload", guard);
+    return () => window.removeEventListener("beforeunload", guard);
+  }, [attempt]);
+
+  const onAbandon = useCallback(() => {
+    if (!abandonArmed) {
+      setAbandonArmed(true);
+      return;
+    }
+    setAbandonArmed(false);
+    void finishRep("abandon");
+  }, [abandonArmed, finishRep]);
+
+  // ⌘Enter is scoped to editor focus (critique backlog P1 — no global submit)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        if (!session.editing) return;
         e.preventDefault();
-        submit();
+        void finishRep("submit");
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "r") {
         e.preventDefault();
         void run();
@@ -119,8 +245,7 @@ export function PracticeScreen() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [challenge, runnable, code]);
+  }, [finishRep, run, session.editing]);
 
   if (loading) {
     return (
@@ -146,6 +271,8 @@ export function PracticeScreen() {
         return { text: "running…", color: "var(--color-faint)" };
       case "compile-error":
         return { text: runInfo.message, color: "var(--color-fail)" };
+      case "submit-error":
+        return { text: runInfo.message, color: "var(--color-fail)" };
       case "unavailable":
         return { text: "runner not available for this challenge yet", color: "var(--color-faint)" };
       case "result": {
@@ -157,9 +284,7 @@ export function PracticeScreen() {
             : r.status === "timeout"
               ? "var(--color-timeout)"
               : "var(--color-fail)";
-        const text = r.setupError
-          ? r.setupError
-          : `${r.casesPassed}/${r.casesTotal} · ${totalMs}ms`;
+        const text = r.setupError ? r.setupError : `${r.casesPassed}/${r.casesTotal} · ${totalMs}ms`;
         return { text, color };
       }
       default:
@@ -243,7 +368,6 @@ export function PracticeScreen() {
             )}
           </div>
 
-          {/* fault toast — honest, typographic, self-clearing */}
           {session.lastFault && (
             <div
               key={session.lastFault.seq}
@@ -283,16 +407,19 @@ export function PracticeScreen() {
           barPct={session.barPct}
           editing={editing}
           onRun={() => void run()}
-          onSubmit={submit}
+          onSubmit={() => void finishRep("submit")}
+          onAbandon={attempt ? onAbandon : undefined}
+          submitDisabled={!attempt || !runnable}
+          submitting={submitting}
+          abandonArmed={abandonArmed}
         />
       </div>
 
-      {/* dev-only metrics overlay (board S2-2 done-when) */}
       {import.meta.env.DEV && (
         <div className="pointer-events-none fixed bottom-3 left-3 z-50 rounded-md border border-border-2 bg-surface/90 px-3 py-2">
           <span className="mono text-[10.5px] leading-relaxed text-muted">
             keys {session.keystrokes} · faults {session.faults} · trace {recorder?.size ?? 0} ops ·{" "}
-            {runnable ? "runnable" : "mock"}
+            {attempt ? `attempt ${attempt.attemptId.slice(0, 8)}` : runnable ? "no attempt" : "mock"}
           </span>
         </div>
       )}

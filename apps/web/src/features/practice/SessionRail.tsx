@@ -26,6 +26,10 @@ export function SessionRail({
   editing,
   onRun,
   onSubmit,
+  onAbandon,
+  submitDisabled = false,
+  submitting = false,
+  abandonArmed = false,
 }: {
   challenge: Challenge;
   elapsed: number;
@@ -36,6 +40,12 @@ export function SessionRail({
   editing: boolean;
   onRun: () => void;
   onSubmit: () => void;
+  /** Present only when a server attempt exists — reveals the solution and ends the rep. */
+  onAbandon?: () => void;
+  submitDisabled?: boolean;
+  submitting?: boolean;
+  /** Two-beat abandon: first press arms, second confirms (irreversible action). */
+  abandonArmed?: boolean;
 }) {
   const dim = { opacity: editing ? 0.5 : 1 } as const;
   return (
@@ -100,13 +110,31 @@ export function SessionRail({
           <Play size={12} />
           Run tests
         </Button>
-        <Button variant="primary" size="md" offset="surface" onClick={onSubmit} className="w-full py-[11px]">
+        <Button
+          variant="primary"
+          size="md"
+          offset="surface"
+          onClick={onSubmit}
+          disabled={submitDisabled}
+          loading={submitting}
+          className="w-full py-[11px]"
+        >
           Submit rep
         </Button>
         <div className="mt-0.5 flex items-center justify-center gap-3">
           <Kbd className="text-muted-2">⌘↵ submit</Kbd>
           <Kbd className="text-muted-2">⌘R run</Kbd>
         </div>
+        {onAbandon && (
+          <button
+            type="button"
+            onClick={onAbandon}
+            className="mt-1 w-full rounded py-1 text-center text-[12px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            style={{ color: abandonArmed ? "var(--color-fail)" : "var(--color-muted-2)" }}
+          >
+            {abandonArmed ? "Press again — this ends the rep" : "Show solution (ends the rep)"}
+          </button>
+        )}
       </div>
     </aside>
   );
