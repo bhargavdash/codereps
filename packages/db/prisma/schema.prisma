@@ -54,11 +54,12 @@ model Profile {
   settings    Json     @default("{}") // { strictPaste: true, ... }
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  attempts    Attempt[]
-  submissions Submission[]
-  progress    UserChallengeProgress[]
-  activity    DailyActivity[]
-  streak      Streak?
+  attempts       Attempt[]
+  submissions    Submission[]
+  progress       UserChallengeProgress[]
+  activity       DailyActivity[]
+  streak         Streak?
+  warmupSessions WarmupSession[]
 
   @@map("profiles")
 }
@@ -142,6 +143,7 @@ model UserChallengeProgress {
   emaFluency      Decimal?  @map("ema_fluency") @db.Decimal(5, 2) // EMA, α = 0.5
   lastAttemptedAt DateTime? @map("last_attempted_at") @db.Timestamptz
   firstPassedAt   DateTime? @map("first_passed_at") @db.Timestamptz
+  lastPassedAt    DateTime? @map("last_passed_at") @db.Timestamptz // drives §9 decay
   srsIntervalDays Int       @default(0) @map("srs_interval_days")
   srsEase         Decimal   @default(2.5) @map("srs_ease") @db.Decimal(3, 2)
   nextReviewAt    DateTime? @map("next_review_at") @db.Timestamptz
@@ -166,6 +168,22 @@ model DailyActivity {
 
   @@id([userId, activityDate])
   @@map("daily_activity")
+}
+
+/// The day's warmup picks, persisted on first request (S5-2): "same 3 all
+/// day" holds by construction — completing a due review can't reroll it.
+model WarmupSession {
+  userId       String   @map("user_id") @db.Uuid
+  date         DateTime @db.Date
+  /// ordered challenge ids with parallel kinds ("review" | "weak-spot" | "new")
+  challengeIds String[] @map("challenge_ids") @db.Uuid
+  kinds        String[]
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user Profile @relation(fields: [userId], references: [id])
+
+  @@id([userId, date])
+  @@map("warmup_sessions")
 }
 
 model Streak {

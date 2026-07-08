@@ -18,6 +18,8 @@ import {
   SubmitBodySchema,
   emaFluency,
   fluencyForSubmission,
+  nextReviewDate,
+  srsAfterSubmission,
   type StreakSummary,
   type SubmissionStatus,
   type SubmitResponse,
@@ -192,6 +194,22 @@ async function persistSubmission(input: PersistInput): Promise<SubmitResponse> {
     const nextBest = fluency === null ? prevBest : prevBest === null ? fluency : Math.max(prevBest, fluency);
     const passed = status === "passed";
 
+    // SRS (§9, S5-2): pass/fail move the schedule; abandoned/timeout/error
+    // leave it alone (a still-due review should stay due)
+    const srsNext = qualifies
+      ? srsAfterSubmission(
+          { intervalDays: prev?.srsIntervalDays ?? 0, ease: Number(prev?.srsEase ?? 2.5) },
+          { passed, score: fluency },
+        )
+      : null;
+    const srsFields = srsNext
+      ? {
+          srsIntervalDays: srsNext.intervalDays,
+          srsEase: srsNext.ease,
+          nextReviewAt: nextReviewDate(now, srsNext.nextReviewInDays),
+        }
+      : {};
+
     await tx.userChallengeProgress.upsert({
       where: { userId_challengeId: { userId, challengeId: attempt.challenge.id } },
       create: {
@@ -203,6 +221,8 @@ async function persistSubmission(input: PersistInput): Promise<SubmitResponse> {
         emaFluency: nextEma,
         lastAttemptedAt: now,
         firstPassedAt: passed ? now : null,
+        lastPassedAt: passed ? now : null,
+        ...srsFields,
       },
       update: {
         attemptsCount: { increment: 1 },
@@ -211,6 +231,8 @@ async function persistSubmission(input: PersistInput): Promise<SubmitResponse> {
         emaFluency: nextEma,
         lastAttemptedAt: now,
         ...(passed && !prev?.firstPassedAt && { firstPassedAt: now }),
+        ...(passed && { lastPassedAt: now }),
+        ...srsFields,
       },
     });
 

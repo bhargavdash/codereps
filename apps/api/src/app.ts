@@ -5,6 +5,7 @@ import { authRouter } from "./routes/auth.js";
 import { challengesRouter } from "./routes/challenges.js";
 import { attemptsRouter } from "./routes/attempts.js";
 import { warmupRouter } from "./routes/warmup.js";
+import { meRouter } from "./routes/me.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 
 export function createApp(): express.Express {
@@ -21,6 +22,7 @@ export function createApp(): express.Express {
   app.use("/api/v1/challenges", challengesRouter);
   app.use("/api/v1/attempts", attemptsRouter);
   app.use("/api/v1/warmup", warmupRouter);
+  app.use("/api/v1/me", meRouter);
 
   app.use(notFound);
   app.use(errorHandler);

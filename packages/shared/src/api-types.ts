@@ -42,12 +42,52 @@ export interface ChallengeDetailResponse {
   challenge: ChallengeDetail;
 }
 
-/** GET /api/v1/warmup — today's 3, deterministic per (user, date) (S4-4). */
+/** GET /api/v1/warmup — today's 3, persisted per (user, date) (S4-4/S5-2). */
 export interface WarmupRepEntry {
   n: number;
-  kind: "review" | "new";
+  kind: "review" | "weak-spot" | "new";
   done: boolean;
   challenge: ChallengeMeta;
+}
+
+/** GET /api/v1/me/summary — dashboard + shell data (S5-5). */
+export interface CategorySummary {
+  category: Category;
+  /** §9 category score over displayed (decayed) fluencies; null until ≥5 passed. */
+  score: number | null;
+  readiness: "ready" | "needs-work" | "not-practiced";
+  passedCount: number;
+  attemptedCount: number;
+  passedAtD4Plus: number;
+  daysSinceLastTrained: number | null;
+  /** mean per-submission fluency per active day, oldest→newest (≤14 points). */
+  trend: { date: string; score: number }[];
+}
+
+export interface MeSummaryResponse {
+  streak: {
+    current: number;
+    longest: number;
+    qualifiedToday: boolean;
+    /** hour (0-23) in the user's timezone when the summary was computed. */
+    localHour: number;
+  };
+  totals: { activeDays: number; totalReps: number; totalPasses: number };
+  categories: CategorySummary[];
+}
+
+/** GET /api/v1/me/heatmap — DailyActivity range (S5-4). */
+export interface HeatmapDay {
+  date: string; // YYYY-MM-DD
+  submissions: number;
+  passes: number;
+  minutesActive: number;
+}
+
+export interface HeatmapResponse {
+  from: string;
+  to: string;
+  days: HeatmapDay[];
 }
 
 export interface WarmupResponse {
