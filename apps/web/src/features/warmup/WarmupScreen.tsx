@@ -17,10 +17,12 @@ type RepState = "done" | "now" | "todo";
 
 const KIND_LABEL: Record<WarmupRepEntry["kind"], string> = {
   review: "REVIEW",
+  "weak-spot": "WEAK SPOT",
   new: "NEW",
 };
 const KIND_COLOR: Record<WarmupRepEntry["kind"], string> = {
   review: "var(--color-muted)",
+  "weak-spot": "var(--color-accent)",
   new: "var(--color-primary-mid)",
 };
 

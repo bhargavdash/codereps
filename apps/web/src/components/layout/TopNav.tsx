@@ -3,7 +3,7 @@ import { cn } from "../../lib/cn";
 import { Logo } from "../ui/Logo";
 import { StreakBadge } from "../ui/StreakBadge";
 import { AccountMenu } from "./AccountMenu";
-import { STREAK } from "../../data/app-data";
+import { streakAtRisk, useSummary } from "../../lib/useSummary";
 
 // mock-era "Practice" tab removed with S4-4: reps are entered from the
 // warmup sheet or the library, and the practice screen has its own chrome
@@ -15,6 +15,7 @@ const tabs = [
 
 export function TopNav() {
   const { pathname } = useLocation();
+  const summary = useSummary();
   return (
     <header
       className="sticky top-0 flex h-14 shrink-0 items-center justify-between border-b border-border bg-bg px-7"
@@ -47,7 +48,13 @@ export function TopNav() {
         </nav>
       </div>
       <div className="flex items-center gap-4">
-        <StreakBadge days={STREAK.days} alive={STREAK.alive} />
+        {summary && (
+          <StreakBadge
+            days={summary.streak.current}
+            alive={summary.streak.qualifiedToday}
+            atRisk={streakAtRisk(summary)}
+          />
+        )}
         <AccountMenu />
       </div>
     </header>

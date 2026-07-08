@@ -20,7 +20,7 @@ import type { ClientCaseResult, ClientResults, SubmitResponse } from "@codereps/
 import type { DebriefState } from "../results/debrief-state";
 import { api } from "../../lib/api";
 import type { WarmupNavState } from "../warmup/WarmupScreen";
-import { STREAK, USER } from "../../data/app-data";
+import { streakAtRisk, useSummary } from "../../lib/useSummary";
 import { useAuth } from "../../lib/auth-context";
 import { NotFound } from "../misc/NotFound";
 
@@ -75,6 +75,7 @@ export function PracticeScreen() {
   const { profile } = useAuth();
   const { display: challenge, runnable, loading } = useChallenge(slug);
   const { attempt } = useAttempt(runnable?.id);
+  const summary = useSummary();
 
   const [code, setCode] = useState<string | null>(null);
   const [cursor, setCursor] = useState({ line: 1, col: 1 });
@@ -337,9 +338,15 @@ export function PracticeScreen() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <StreakBadge days={STREAK.days} alive={STREAK.alive} />
+          {summary && (
+            <StreakBadge
+              days={summary.streak.current}
+              alive={summary.streak.qualifiedToday}
+              atRisk={streakAtRisk(summary)}
+            />
+          )}
           <span className="h-[18px] w-px bg-border-2" />
-          <Avatar initials={USER.initials} size={26} />
+          <Avatar initials={(profile?.username ?? "??").slice(0, 2).toUpperCase()} size={26} />
         </div>
       </div>
 

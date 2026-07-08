@@ -39,17 +39,7 @@ export interface Challenge {
   tests: TestCase[];
 }
 
-export type Readiness = "sharp" | "ready" | "needs-work" | "untrained";
 
-export interface ReadinessRow {
-  label: string;
-  readiness: Readiness;
-  evidence: string;
-  fluency: number | null;
-  /** sparkline points, 7 values 0..1 (1 = high fluency) — direction reads as trend */
-  trend: number[];
-  rising: boolean;
-}
 
 export interface LibraryRow {
   slug: string;
@@ -61,12 +51,3 @@ export interface LibraryRow {
   reps: number;
 }
 
-export interface WarmupRep {
-  n: number;
-  kind: "review" | "weak-spot" | "new";
-  slug: string;
-  title: string;
-  subtitle: string;
-  parSeconds: number;
-  state: "done" | "now" | "todo";
-}
