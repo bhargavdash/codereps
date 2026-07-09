@@ -29,6 +29,7 @@
     "@uiw/react-codemirror": "^4.25.10",
     "clsx": "^2.1.1",
     "motion": "^12.42.2",
+    "posthog-js": "^1.398.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.18.1",
