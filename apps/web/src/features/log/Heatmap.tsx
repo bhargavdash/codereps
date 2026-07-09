@@ -74,7 +74,9 @@ export function Heatmap({ heatmap, totals }: { heatmap: HeatmapResponse; totals:
     <div className="flex flex-col gap-3.5 rounded-[10px] border border-border bg-surface-2 px-6 py-5">
       <div className="flex items-baseline justify-between">
         <span className="mono text-[11px] tracking-[0.09em] text-muted-2">
-          {totals.activeDays} ACTIVE {totals.activeDays === 1 ? "DAY" : "DAYS"} · {totals.totalReps} REPS
+          {totals.totalReps === 0
+            ? "DAY 1 STARTS TODAY — YOUR FIRST REP LIGHTS THE FIRST CELL"
+            : `${totals.activeDays} ACTIVE ${totals.activeDays === 1 ? "DAY" : "DAYS"} · ${totals.totalReps} REPS`}
         </span>
         <div className="flex items-center gap-[7px]">
           <span className="mono text-[11px] text-muted-2">less</span>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppShell } from "../../components/layout/AppShell";
 import { Button } from "../../components/ui/Button";
@@ -6,6 +7,8 @@ import { Check, Play } from "../../components/icons";
 import { fmtClock } from "../../lib/format";
 import { CATEGORY_LABEL } from "../../data/types";
 import { useWarmup } from "./useWarmup";
+import { useSummary } from "../../lib/useSummary";
+import { track } from "../../lib/analytics";
 import type { WarmupRepEntry } from "@codereps/shared";
 
 /** Router state handed to the practice screen so it knows its place in the session. */
@@ -100,6 +103,8 @@ function RepRow({ rep, state, navState }: { rep: WarmupRepEntry; state: RepState
 export function WarmupScreen() {
   const navigate = useNavigate();
   const { state, retry } = useWarmup();
+  const summary = useSummary();
+  const firstRun = summary !== null && summary.totals.totalReps === 0;
 
   const dateLabel =
     state.status === "ready"
@@ -113,6 +118,16 @@ export function WarmupScreen() {
   const reps = state.status === "ready" ? state.warmup.reps : [];
   const activeIdx = reps.findIndex((r) => !r.done);
   const allDone = state.status === "ready" && reps.length > 0 && activeIdx === -1;
+
+  // once per browser per day — sessionStorage dedupes revisits of a done sheet
+  const warmupDate = state.status === "ready" ? state.warmup.date : null;
+  useEffect(() => {
+    if (!allDone || !warmupDate) return;
+    const key = `warmup_completed:${warmupDate}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    track("warmup_completed", { date: warmupDate });
+  }, [allDone, warmupDate]);
   const estMinutes = Math.max(1, Math.ceil(reps.reduce((a, r) => a + r.challenge.parSeconds, 0) / 60));
   const navState: WarmupNavState = {
     warmup: { slugs: reps.map((r) => r.challenge.slug), n: Math.max(0, activeIdx) },
@@ -138,8 +153,18 @@ export function WarmupScreen() {
               )}
             </div>
             <p className="mb-7 text-[15px] leading-[1.55] text-muted">
-              Three reps, same three all day. Reviews keep old patterns warm; new ones stretch the
-              range.
+              {firstRun ? (
+                <>
+                  <span className="text-ink-soft">Day 1.</span> Three short reps set your baseline —
+                  the editor allows no autocomplete and no paste, and every rep is scored against a
+                  par time. Your first fluency score lands after the first submit.
+                </>
+              ) : (
+                <>
+                  Three reps, same three all day. Reviews keep old patterns warm; new ones stretch
+                  the range.
+                </>
+              )}
             </p>
 
             {state.status === "loading" ? (
