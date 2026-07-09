@@ -19,6 +19,7 @@ import type { RunResult } from "@codereps/shared/runner-core";
 import type { ClientCaseResult, ClientResults, SubmitResponse } from "@codereps/shared";
 import type { DebriefState } from "../results/debrief-state";
 import { api } from "../../lib/api";
+import { track } from "../../lib/analytics";
 import type { WarmupNavState } from "../warmup/WarmupScreen";
 import { streakAtRisk, useSummary } from "../../lib/useSummary";
 import { useAuth } from "../../lib/auth-context";
@@ -193,6 +194,11 @@ export function PracticeScreen() {
               });
 
         finishedRef.current = true;
+        track(mode === "abandon" ? "rep_abandoned" : "rep_submitted", {
+          slug: challenge.slug,
+          status: submit.submission.status,
+          durationMs: submit.submission.durationMs,
+        });
         const state: DebriefState = {
           submit,
           yourCode: code,
@@ -221,6 +227,11 @@ export function PracticeScreen() {
     },
     [attempt, runnable, challenge, code, session.keystrokes, session.faults, recorder, run, navigate, submitting, warmupCtx],
   );
+
+  useEffect(() => {
+    if (attempt && challenge) track("rep_started", { slug: challenge.slug });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempt?.attemptId]);
 
   // time-limit expiry → auto-submit timeout (board S3-1)
   useEffect(() => {

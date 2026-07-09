@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Lock, Info } from "../../components/icons";
 import { useAuth } from "../../lib/auth-context";
+import { track } from "../../lib/analytics";
 
 /** Minimal, shell-styled — the session, not the chrome, is the point. */
 export function LoginScreen() {
@@ -27,9 +28,11 @@ export function LoginScreen() {
     try {
       if (mode === "signin") {
         await signInWithPassword(email, password);
+        track("signed_in");
         navigate(from, { replace: true });
       } else {
         await signUpWithPassword(email, password);
+        track("signed_up");
         setCheckEmail(true);
       }
     } catch (err) {
