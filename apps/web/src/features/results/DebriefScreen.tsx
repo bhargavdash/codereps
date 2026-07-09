@@ -184,9 +184,9 @@ export function DebriefScreen() {
         <div className="h-px bg-border" />
 
         {/* Content: fluency + splits | diff */}
-        <div className="flex min-h-[460px] flex-1 gap-8">
+        <div className="flex min-h-[460px] flex-1 flex-col gap-8 lg:flex-row">
           {/* left */}
-          <div className="flex w-[400px] shrink-0 flex-col gap-[22px]">
+          <div className="flex flex-col gap-[22px] lg:w-[400px] lg:shrink-0">
             <div className="rounded-lg border border-border bg-surface p-5">
               <div className="flex items-end justify-between">
                 <div className="flex flex-col gap-2">

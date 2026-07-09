@@ -11,8 +11,8 @@ colors:
   ink: "oklch(0.93 0.005 250)"
   ink-soft: "oklch(0.86 0.005 250)"
   muted: "oklch(0.65 0.01 250)"
-  muted-2: "oklch(0.55 0.01 250)"
-  faint: "oklch(0.45 0.01 250)"
+  muted-2: "oklch(0.62 0.01 250)"
+  faint: "oklch(0.58 0.01 250)"
   primary: "oklch(0.65 0.16 250)"
   primary-hi: "oklch(0.70 0.16 250)"
   primary-lo: "oklch(0.59 0.15 250)"
@@ -147,7 +147,7 @@ A near-neutral iron ramp carries the entire instrument body; a single cobalt and
 - **Surface** (`oklch(0.145 0.004 250)`) / **Surface-2** (`oklch(0.128 0.004 250)`) / **Editor** (`oklch(0.112 0.003 250)`): Panels, session rail, prompt panel, and the editor field — a faintly cobalt-tinted tonal stack, never warm.
 - **Raised** (`oklch(0.18 0.006 250)`): Hover fills, gutters, chips.
 - **Ink** (`oklch(0.93 0.005 250)`) / **Ink-soft** (`oklch(0.86 0.005 250)`): Body text and reading copy.
-- **Muted** (`oklch(0.65 0.01 250)`) / **Muted-2** (`oklch(0.55 0.01 250)`) / **Faint** (`oklch(0.45 0.01 250)`): Secondary text, mono meta-labels, and empty/tertiary states. Muted is never used for primary body copy.
+- **Muted** (`oklch(0.65 0.01 250)`) / **Muted-2** (`oklch(0.62 0.01 250)`) / **Faint** (`oklch(0.58 0.01 250)`): Secondary text, mono meta-labels, and empty/tertiary states. Muted is never used for primary body copy. Muted-2 and Faint were raised from their original 0.55/0.45 lightness (S6-4) to clear WCAG AA 4.5:1 at the 9-13px sizes they actually ship at.
 - **Border** (`oklch(0.18 0.006 250)`) / **Border-2** (`oklch(0.24 0.006 250)`): Hairline dividers and stronger chip strokes.
 
 ### Named Rules
