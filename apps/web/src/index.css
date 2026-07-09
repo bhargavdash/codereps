@@ -22,8 +22,8 @@
   --color-ink: oklch(0.93 0.005 250); /* body text */
   --color-ink-soft: oklch(0.86 0.005 250); /* prompt copy */
   --color-muted: oklch(0.65 0.01 250); /* secondary — never body copy */
-  --color-muted-2: oklch(0.55 0.01 250); /* captions, meta labels */
-  --color-faint: oklch(0.45 0.01 250); /* tertiary, empty */
+  --color-muted-2: oklch(0.62 0.01 250); /* captions, meta labels (AA at label sizes — S6-4) */
+  --color-faint: oklch(0.58 0.01 250); /* tertiary, empty (raised from 0.45 — S6-4, verified 4.63:1 on surface at 9-12px) */
 
   /* ---- Signal ---- */
   --color-primary: oklch(0.65 0.16 250); /* cobalt */
@@ -65,7 +65,7 @@
   --color-syn-fn: oklch(0.8 0.09 230);
   --color-syn-lit: oklch(0.8 0.08 85);
   --color-syn-punc: oklch(0.6 0.01 250);
-  --color-syn-com: oklch(0.5 0.01 250);
+  --color-syn-com: oklch(0.58 0.01 250); /* comments — readable at 13.5px (S6-4) */
 
   /* ---- Type ---- */
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
