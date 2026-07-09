@@ -47,9 +47,6 @@ export function LandingScreen() {
         {/* HERO */}
         <section className="flex flex-col items-center gap-16 py-[84px] lg:flex-row">
           <div className="flex max-w-[620px] flex-1 flex-col gap-[30px]">
-            <span className="mono text-[13px] tracking-[0.04em]" style={{ color: "var(--color-accent)" }}>
-              FLUENCY TRAINING FOR ENGINEERS
-            </span>
             <h1
               className="text-[clamp(2.75rem,5vw,3.75rem)] font-semibold leading-[1.04] tracking-[-0.03em]"
               style={{ textWrap: "balance" }}
@@ -62,16 +59,16 @@ export function LandingScreen() {
               tracked as it decays.
             </p>
             <div className="mt-1 flex items-center gap-3.5">
-              <Link to="/practice/debounce" className={buttonClasses("primary", "lg", "bg", "gap-2.5")}>
+              <Link to="/login" className={buttonClasses("primary", "lg", "bg", "gap-2.5")}>
                 <Play size={15} />
                 Start a rep
               </Link>
-              <Link
-                to="/practice/debounce/debrief"
+              <a
+                href="#method"
                 className={buttonClasses("secondary", "lg", "bg", "bg-[oklch(0.16_0.005_250)]")}
               >
-                Watch a rep
-              </Link>
+                See the method
+              </a>
             </div>
             <div className="mt-1.5 flex items-center gap-[18px]">
               <span className="mono text-[12.5px] text-muted-2">no autocomplete</span>
@@ -86,7 +83,7 @@ export function LandingScreen() {
         </section>
 
         {/* THESIS */}
-        <section className="border-t border-border pb-16 pt-12">
+        <section id="method" className="scroll-mt-6 border-t border-border pb-16 pt-12">
           <p
             className="max-w-[1000px] text-[clamp(1.75rem,3.4vw,2.375rem)] font-medium leading-[1.22] tracking-[-0.015em]"
             style={{ textWrap: "balance" }}
@@ -117,13 +114,9 @@ export function LandingScreen() {
             <LogoMark size={16} muted />
             <span className="mono text-[12.5px] text-muted-2">CodeReps · train your fluency</span>
           </div>
-          <div className="flex gap-6">
-            {["Method", "Pricing", "Changelog"].map((l) => (
-              <span key={l} className="text-[13px] text-muted-2">
-                {l}
-              </span>
-            ))}
-          </div>
+          <Link to="/login" className="text-[13px] text-muted-2 transition-colors hover:text-ink">
+            Sign in
+          </Link>
         </div>
       </footer>
     </div>
