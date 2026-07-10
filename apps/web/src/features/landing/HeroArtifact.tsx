@@ -12,9 +12,11 @@ const P = ({ children }: { children: React.ReactNode }) => (
   <span style={{ color: "var(--color-syn-punc)" }}>{children}</span>
 );
 
-export function HeroArtifact() {
+export function HeroArtifact({ className = "" }: { className?: string }) {
   return (
-    <div className="w-[560px] max-w-full shrink-0 overflow-hidden rounded-xl border border-border-2 bg-editor shadow-[0_40px_90px_-40px_oklch(0_0_0_/_0.8)]">
+    <div
+      className={`w-[560px] max-w-full shrink-0 overflow-hidden rounded-xl border border-border-2 bg-editor shadow-[0_40px_90px_-40px_oklch(0_0_0_/_0.8)] ${className}`}
+    >
       {/* window bar */}
       <div className="flex h-[38px] items-center gap-2 border-b border-border bg-[oklch(0.13_0.004_250)] px-3.5">
         <span className="size-2.5 rounded-full bg-[oklch(0.3_0.01_250)]" />
