@@ -112,12 +112,17 @@ meRouter.get("/summary", async (req, res) => {
   });
 
   const lastActiveDay = streakRow?.lastActiveDate ? dateToDay(streakRow.lastActiveDate) : null;
+  const current = streakRow?.current ?? 0;
+  const justBroken =
+    current > 0 && lastActiveDay !== null && lastActiveDay !== today && lastActiveDay !== addDays(today, -1);
   const response: MeSummaryResponse = {
     streak: {
-      current: streakRow?.current ?? 0,
+      current,
       longest: streakRow?.longest ?? 0,
       qualifiedToday: lastActiveDay === today,
       localHour,
+      justBroken,
+      brokenLength: justBroken ? current : null,
     },
     totals: {
       activeDays: activityAgg._count._all,

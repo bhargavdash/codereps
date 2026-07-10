@@ -71,6 +71,17 @@ export interface MeSummaryResponse {
     qualifiedToday: boolean;
     /** hour (0-23) in the user's timezone when the summary was computed. */
     localHour: number;
+    /**
+     * true when a real gap (missed ≥1 full day) has happened since `current`
+     * was last written — the Streak row only resets lazily on the next
+     * qualifying submission, so this is the read-time signal that a
+     * returning user's streak has already died even though `current` (still
+     * the stale pre-reset value here) hasn't caught up yet. Exists to drive
+     * the `streak_broken` analytics event on warmup load.
+     */
+    justBroken: boolean;
+    /** the streak length that just broke, for messaging/analytics — null unless justBroken. */
+    brokenLength: number | null;
   };
   totals: { activeDays: number; totalReps: number; totalPasses: number };
   categories: CategorySummary[];

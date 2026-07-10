@@ -9,6 +9,7 @@ type EventName =
   | "rep_submitted"
   | "rep_abandoned"
   | "warmup_completed"
+  | "streak_broken"
   | "signed_up"
   | "signed_in";
 

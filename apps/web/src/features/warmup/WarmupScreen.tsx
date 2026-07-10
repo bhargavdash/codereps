@@ -115,6 +115,17 @@ export function WarmupScreen() {
   }, [firstRun]);
   const isDay1Session = firstRun || sessionStorage.getItem("day1_session") === "1";
 
+  // server-detected: a real gap already killed the streak, but the DB row
+  // resets lazily on next qualifying submission — warmup load is the first
+  // moment a returning user (and this tracker) can see it.
+  useEffect(() => {
+    if (!summary?.streak.justBroken) return;
+    const key = `streak_broken:${summary.streak.brokenLength}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    track("streak_broken", { previousStreak: summary.streak.brokenLength ?? 0 });
+  }, [summary]);
+
   const dateLabel =
     state.status === "ready"
       ? new Date(`${state.warmup.date}T00:00:00`).toLocaleDateString(undefined, {

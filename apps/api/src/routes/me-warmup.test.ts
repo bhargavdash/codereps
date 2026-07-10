@@ -163,6 +163,25 @@ describe.skipIf(!hasDb)("S5: srs + warmup v2 + summary + heatmap", { timeout: 90
     expect(res.body.streak.localHour).toBeGreaterThanOrEqual(0);
     expect(res.body.streak.localHour).toBeLessThanOrEqual(23);
     expect(res.body.totals.totalReps).toBeGreaterThanOrEqual(4);
+    expect(res.body.streak.justBroken).toBe(false); // qualified today — nothing broke
+    expect(res.body.streak.brokenLength).toBeNull();
+  });
+
+  it("summary: a real gap surfaces justBroken before the next submission resets it", async () => {
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+    const [y, m, d] = today.split("-").map(Number);
+    const threeDaysAgo = new Date(Date.UTC(y!, m! - 1, d! - 3));
+    await db.prisma.streak.update({
+      where: { userId: TEST_USER },
+      data: { lastActiveDate: threeDaysAgo, current: 5, longest: 6 },
+    });
+
+    const res = await request(app).get("/api/v1/me/summary");
+    expect(res.status).toBe(200);
+    expect(res.body.streak.justBroken).toBe(true);
+    expect(res.body.streak.brokenLength).toBe(5);
+    expect(res.body.streak.current).toBe(5); // still the stale pre-reset value
+    expect(res.body.streak.qualifiedToday).toBe(false);
   });
 
   it("heatmap: today's activity appears in the range scan", async () => {
