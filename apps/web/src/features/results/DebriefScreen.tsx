@@ -8,6 +8,7 @@ import type { DebriefState } from "./debrief-state";
 import { CATEGORY_LABEL, type Challenge } from "../../data/types";
 import { diffLines } from "../../lib/line-diff";
 import { fmtClock, fmtDelta } from "../../lib/format";
+import { useSummary } from "../../lib/useSummary";
 import type { SubmissionStatus } from "@codereps/shared";
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -58,6 +59,7 @@ export function DebriefScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as DebriefState | null;
+  const summary = useSummary();
 
   const diff = useMemo(
     () => (state ? diffLines(state.yourCode, state.submit.solutionCode) : null),
@@ -72,6 +74,7 @@ export function DebriefScreen() {
   const { submit, display, cases, faults } = state;
   const s = submit.submission;
   const v = verdictConfig(s.status, s.testsPassed, s.testsTotal);
+  const isFirstScore = summary !== null && summary.totals.totalReps === 1 && submit.fluency.score !== null;
   const timeSeconds = Math.round(s.durationMs / 1000);
   const delta = timeSeconds - display.parSeconds;
   const parRatio = (timeSeconds / display.parSeconds).toFixed(2);
@@ -190,7 +193,20 @@ export function DebriefScreen() {
             <div className="rounded-lg border border-border bg-surface p-5">
               <div className="flex items-end justify-between">
                 <div className="flex flex-col gap-2">
-                  <Label>FLUENCY · THIS REP</Label>
+                  <div className="flex items-center gap-2">
+                    <Label>{isFirstScore ? "YOUR FIRST FLUENCY SCORE" : "FLUENCY · THIS REP"}</Label>
+                    {isFirstScore && (
+                      <span
+                        className="mono rounded-[4px] px-1.5 py-[1px] text-[9.5px] tracking-[0.06em]"
+                        style={{
+                          color: "var(--color-accent)",
+                          border: "1px solid color-mix(in oklch, var(--color-accent) 40%, transparent)",
+                        }}
+                      >
+                        DAY 1
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-baseline gap-2">
                     <span className="mono text-[48px] font-medium leading-none text-ink">
                       {submit.fluency.score ?? "—"}
@@ -211,7 +227,11 @@ export function DebriefScreen() {
                   )}
                 </div>
               </div>
-              <p className="mt-3.5 text-[12.5px] leading-[1.5] text-muted-2">{verdictNote(state)}</p>
+              <p className="mt-3.5 text-[12.5px] leading-[1.5] text-muted-2">
+                {isFirstScore
+                  ? "This number is honest, not motivational — it's built from your actual accuracy and speed against par, nothing else. It falls a little if you skip days, and rises as this pattern gets faster to recall. Two more reps in today's warmup set the rest of your baseline."
+                  : verdictNote(state)}
+              </p>
             </div>
 
             <div className="flex min-h-0 flex-1 flex-col gap-3">

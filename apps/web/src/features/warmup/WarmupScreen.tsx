@@ -106,6 +106,15 @@ export function WarmupScreen() {
   const summary = useSummary();
   const firstRun = summary !== null && summary.totals.totalReps === 0;
 
+  // WarmupScreen remounts on the way back from the debrief ("Finish warmup" navigates
+  // here fresh), so by completion time useSummary() already reflects the reps just
+  // logged and firstRun itself has flipped false. Stamp the day-1 session the moment
+  // it's first observed so the completion nudge below can still tell it apart.
+  useEffect(() => {
+    if (firstRun) sessionStorage.setItem("day1_session", "1");
+  }, [firstRun]);
+  const isDay1Session = firstRun || sessionStorage.getItem("day1_session") === "1";
+
   const dateLabel =
     state.status === "ready"
       ? new Date(`${state.warmup.date}T00:00:00`).toLocaleDateString(undefined, {
@@ -210,10 +219,10 @@ export function WarmupScreen() {
                       Session complete — {reps.length} reps logged.
                     </span>
                     <Link
-                      to="/library"
+                      to={isDay1Session ? "/log" : "/library"}
                       className="ml-2 text-[13.5px] text-muted underline-offset-4 hover:text-ink hover:underline"
                     >
-                      Keep going in the library
+                      {isDay1Session ? "See your first readiness numbers" : "Keep going in the library"}
                     </Link>
                   </div>
                 ) : (
