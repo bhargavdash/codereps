@@ -87,7 +87,7 @@ export function DebriefScreen() {
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
-      <header className="sticky top-0 z-10 flex h-[52px] shrink-0 items-center justify-between border-b border-border bg-bg px-6">
+      <header className="sticky top-0 z-(--z-sticky) flex h-[52px] shrink-0 items-center justify-between border-b border-border bg-bg px-6">
         <div className="flex items-center gap-3.5">
           <Link to="/warmup" className={buttonClasses("ghost", "sm", "bg", "gap-1.5 px-1.5 text-[13px]")}>
             <ChevronLeft size={14} />

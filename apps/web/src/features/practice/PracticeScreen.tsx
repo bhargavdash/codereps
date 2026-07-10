@@ -451,7 +451,7 @@ export function PracticeScreen() {
       </div>
 
       {import.meta.env.DEV && (
-        <div className="pointer-events-none fixed bottom-3 left-3 z-50 rounded-md border border-border-2 bg-surface/90 px-3 py-2">
+        <div className="pointer-events-none fixed bottom-3 left-3 z-(--z-toast) rounded-md border border-border-2 bg-surface/90 px-3 py-2">
           <span className="mono text-[10.5px] leading-relaxed text-muted">
             keys {session.keystrokes} · faults {session.faults} · trace {recorder?.size ?? 0} ops ·{" "}
             {attempt ? `attempt ${attempt.attemptId.slice(0, 8)}` : runnable ? "no attempt" : "mock"}
